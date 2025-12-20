@@ -1,131 +1,122 @@
-import { supabase } from '@/lib/supabase'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Brain, ArrowLeft, Calendar, Database } from 'lucide-react'
-import { notFound } from 'next/navigation'
+import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon, Upload } from 'lucide-react'
+import Navigation from '@/components/Navigation'
+import { getOrganoidDetail, getOrganoidFiles, OrganoidDetail, OrganoidFile } from '@/lib/organoid'
+import MRIViewer from '@/components/MRIViewer'
 
-interface OrganoidDetail {
-  id: string
-  organoid_id: string
-  region_name: string
-  region_abbreviation: string
-  genotype_name: string
-  cell_line: string | null
-  initial_age_weeks: number | null
-  notes: string | null
-  scan_count: number
-  min_age_weeks: number | null
-  max_age_weeks: number | null
-}
+export default function OrganoidPage({ params }: { params: { id: string } }) {
+  const [organoid, setOrganoid] = useState<OrganoidDetail | null>(null)
+  const [files, setFiles] = useState<OrganoidFile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [trackingGroup, setTrackingGroup] = useState<OrganoidDetail[]>([])
 
-interface MRIScan {
-  id: string
-  scan_date: string
-  age_weeks: number
-  volume_path: string | null
-  resolution_x: number | null
-  resolution_y: number | null
-  resolution_z: number | null
-  sequence_type: string
-  metadata: Record<string, any>
-}
+  useEffect(() => {
+    loadData()
+  }, [params.id])
 
-async function getOrganoid(id: string) {
-  try {
-    const { data, error } = await supabase
-      .from('organoid_details')
-      .select('*')
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-    return data as OrganoidDetail
-  } catch (error) {
-    console.error('Error fetching organoid:', error)
-    return null
+  async function loadData() {
+    setLoading(true)
+    try {
+      const organoidData = await getOrganoidDetail(params.id)
+      if (organoidData) {
+        setOrganoid(organoidData)
+        
+        // 加载文件
+        const organoidFiles = await getOrganoidFiles(organoidData.id)
+        setFiles(organoidFiles)
+        
+        // 如果有追踪，加载追踪组
+        if (organoidData.tracked_id_value) {
+          // 这里可以加载追踪组的其他类器官
+          // const trackingData = await getTrackingGroupOrganoids(organoidData.tracked_id_value)
+          // setTrackingGroup(trackingData)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading organoid:', error)
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
-async function getMRIScans(organoidId: string) {
-  try {
-    const { data, error } = await supabase
-      .from('mri_scans')
-      .select('*')
-      .eq('organoid_id', organoidId)
-      .order('age_weeks', { ascending: true })
-
-    if (error) throw error
-    return data as MRIScan[]
-  } catch (error) {
-    console.error('Error fetching MRI scans:', error)
-    return []
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading organoid data...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
-}
-
-export default async function OrganoidPage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const organoid = await getOrganoid(params.id)
-  const scans = organoid ? await getMRIScans(organoid.id) : []
 
   if (!organoid) {
-    notFound()
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center">
+            <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">404</h1>
+            <p className="text-xl text-gray-600 mb-6">Organoid not found</p>
+            <Link
+              href="/browse"
+              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            >
+              Back to Browse
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-3">
-              <Image 
-                src="/logo.png" 
-                alt="FORMA Atlas Logo" 
-                width={56} 
-                height={56}
-                className="object-contain"
-                style={{ backgroundColor: 'transparent' }}
-              />
-              <span className="text-xl font-bold text-gray-900">FORMA Atlas</span>
-            </Link>
-            <div className="flex space-x-6">
-              <Link href="/" className="text-gray-700 hover:text-primary-600 font-medium">
-                Home
-              </Link>
-              <Link href="/browse" className="text-gray-700 hover:text-primary-600 font-medium">
-                Browse Data
-              </Link>
-              <Link href="/about" className="text-gray-700 hover:text-primary-600 font-medium">
-                About
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative">
+      <Navigation />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Back Button */}
         <Link
           href="/browse"
-          className="inline-flex items-center space-x-2 text-gray-600 hover:text-primary-600 mb-6"
+          className="inline-flex items-center space-x-2 text-gray-600 hover:text-primary-600 mb-6 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>Back to Browse</span>
         </Link>
 
         {/* Organoid Header */}
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+        <div className="glass-effect rounded-xl shadow-lg p-8 mb-6 border border-gray-200/50">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {organoid.organoid_id}
+              <h1 className="text-5xl font-bold text-gray-900 mb-3">
+                <span className="gradient-text">{organoid.subject_id}</span>
               </h1>
-              <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-sm font-semibold rounded">
-                {organoid.region_abbreviation}
-              </span>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {organoid.region_abbreviation && (
+                  <span className="inline-block px-3 py-1 bg-primary-100 text-primary-700 text-sm font-semibold rounded">
+                    {organoid.region_abbreviation}
+                  </span>
+                )}
+                {organoid.tracking_type && (
+                  <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded flex items-center gap-1">
+                    <LinkIcon className="h-3 w-3" />
+                    Tracked
+                  </span>
+                )}
+                {organoid.tracked_id_value && (
+                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
+                    Track ID: {organoid.tracked_id_value}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -133,52 +124,74 @@ export default async function OrganoidPage({
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Organoid Information</h2>
               <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-gray-500">Region:</dt>
-                  <dd className="text-gray-900 font-medium">{organoid.region_name}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-gray-500">Genotype:</dt>
-                  <dd className="text-gray-900 font-medium">{organoid.genotype_name}</dd>
-                </div>
-                {organoid.cell_line && (
+                {organoid.scan_id && (
                   <div className="flex justify-between">
-                    <dt className="text-gray-500">Cell Line:</dt>
-                    <dd className="text-gray-900 font-medium">{organoid.cell_line}</dd>
+                    <dt className="text-gray-500">Scan ID:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.scan_id}</dd>
                   </div>
                 )}
-                {organoid.initial_age_weeks && (
+                {organoid.raw_data_id && (
                   <div className="flex justify-between">
-                    <dt className="text-gray-500">Initial Age:</dt>
-                    <dd className="text-gray-900 font-medium">{organoid.initial_age_weeks} weeks</dd>
+                    <dt className="text-gray-500">Raw Data ID:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.raw_data_id}</dd>
+                  </div>
+                )}
+                {organoid.well_id && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Well ID:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.well_id}</dd>
+                  </div>
+                )}
+                {organoid.region_name && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Region:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.region_name}</dd>
+                  </div>
+                )}
+                {organoid.line_name && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Cell Line:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.line_name}</dd>
+                  </div>
+                )}
+                {organoid.diagnose && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Diagnose:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.diagnose}</dd>
+                  </div>
+                )}
+                {organoid.age && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Age:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.age}</dd>
                   </div>
                 )}
               </dl>
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Scan Statistics</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
               <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-gray-500">Total Scans:</dt>
-                  <dd className="text-gray-900 font-medium">{organoid.scan_count}</dd>
-                </div>
-                {organoid.min_age_weeks !== null && organoid.max_age_weeks !== null && (
-                  <>
-                    <div className="flex justify-between">
-                      <dt className="text-gray-500">Age Range:</dt>
-                      <dd className="text-gray-900 font-medium">
-                        {organoid.min_age_weeks} - {organoid.max_age_weeks} weeks
-                      </dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-gray-500">Duration:</dt>
-                      <dd className="text-gray-900 font-medium">
-                        {organoid.max_age_weeks - organoid.min_age_weeks} weeks
-                      </dd>
-                    </div>
-                  </>
+                {organoid.batch_tag && (
+                  <div className="flex justify-between">
+                    <dt className="text-gray-500">Batch:</dt>
+                    <dd className="text-gray-900 font-medium">{organoid.batch_tag}</dd>
+                  </div>
                 )}
+                {organoid.scan_date && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <dt className="text-gray-500">Scan Date:</dt>
+                    <dd className="text-gray-900 font-medium">
+                      {new Date(organoid.scan_date).toLocaleDateString()}
+                    </dd>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-gray-400" />
+                  <dt className="text-gray-500">Files:</dt>
+                  <dd className="text-gray-900 font-medium">{organoid.file_count || 0}</dd>
+                </div>
               </dl>
             </div>
           </div>
@@ -191,65 +204,72 @@ export default async function OrganoidPage({
           )}
         </div>
 
-        {/* MRI Scans */}
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        {/* Files Section */}
+        <div className="glass-effect rounded-xl shadow-lg p-8 mb-6 border border-gray-200/50">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">MRI Scans</h2>
-            <span className="text-gray-500">{scans.length} scans</span>
+            <h2 className="text-2xl font-bold text-gray-900">Files</h2>
+            <span className="text-gray-500">{files.length} file(s)</span>
           </div>
 
-          {scans.length === 0 ? (
+          {files.length === 0 ? (
             <div className="text-center py-12">
-              <Database className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">No MRI scans available for this organoid.</p>
+              <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-600 mb-4">No files available for this organoid.</p>
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                <Upload className="h-4 w-4" />
+                Upload Files
+              </button>
             </div>
           ) : (
             <div className="space-y-4">
-              {scans.map((scan) => (
+              {files.map((file) => (
                 <div
-                  key={scan.id}
+                  key={file.id}
                   className="border border-gray-200 rounded-lg p-6 hover:border-primary-300 transition-colors"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        Scan at {scan.age_weeks} weeks
-                      </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{new Date(scan.scan_date).toLocaleDateString()}</span>
-                        </div>
-                        <span>{scan.sequence_type}</span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{file.file_name}</h3>
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                        {file.file_type && (
+                          <span className="flex items-center gap-1">
+                            <Tag className="h-4 w-4" />
+                            {file.file_type}
+                          </span>
+                        )}
+                        {file.file_size && (
+                          <span>{(file.file_size / 1024 / 1024).toFixed(2)} MB</span>
+                        )}
+                        <span>{new Date(file.uploaded_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4 text-sm">
-                    {scan.resolution_x && scan.resolution_y && scan.resolution_z && (
-                      <div>
-                        <span className="text-gray-500">Resolution: </span>
-                        <span className="text-gray-900 font-medium">
-                          {scan.resolution_x} × {scan.resolution_y} × {scan.resolution_z} μm
-                        </span>
-                      </div>
-                    )}
-                    {scan.volume_path && (
-                      <div>
-                        <span className="text-gray-500">Volume Path: </span>
-                        <span className="text-gray-900 font-medium font-mono text-xs">
-                          {scan.volume_path}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex gap-2">
+                      {file.metadata?.public_url && (
+                        <a
+                          href={file.metadata.public_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                        >
+                          View
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+
+        {/* MRI Viewer */}
+        {files.some(f => f.file_type === 'mri_volume') && (
+          <div className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">3D Visualization</h2>
+            <MRIViewer />
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
