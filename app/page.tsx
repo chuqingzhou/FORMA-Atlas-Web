@@ -75,7 +75,7 @@ export default function Home() {
             <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               Four-dimensional Organoid Resonance Mapping Atlas - The largest longitudinal MRI dataset of human brain organoids
             </p>
-            <div className="flex flex-col items-center space-y-4 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+            <div className="flex justify-center items-center space-x-4 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
               <Link
                 href="/browse"
                 className="group relative bg-gradient-to-r from-primary-600 to-primary-700 text-white px-12 py-5 rounded-xl font-semibold text-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
