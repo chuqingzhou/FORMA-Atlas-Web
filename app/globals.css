@@ -74,6 +74,15 @@ body {
   }
 }
 
+@keyframes wave-float {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0px);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out;
 }
@@ -89,6 +98,10 @@ body {
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-shift 8s ease infinite;
+}
+
+.animate-wave-float {
+  animation: wave-float 8s ease-in-out infinite;
 }
 
 /* 背景图案样式 */

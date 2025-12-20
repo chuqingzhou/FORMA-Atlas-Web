@@ -66,10 +66,24 @@ export default function Home() {
                 <div className="absolute inset-0 bg-primary-400 rounded-full opacity-20 blur-3xl animate-pulse-glow"></div>
               </div>
             </div>
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <span className="gradient-text">FORMA Atlas</span>
-            </h1>
-            <div className="flex items-center justify-center gap-2 mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <div className="relative mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <h1 className="text-6xl md:text-7xl font-bold relative z-10">
+                <span className="gradient-text">FORMA Atlas</span>
+              </h1>
+              {/* 波浪背景装饰 */}
+              <div className="absolute -bottom-12 left-1/2 w-full max-w-5xl opacity-20 pointer-events-none animate-wave-float">
+                <Image 
+                  src="/wave.png" 
+                  alt="Wave decoration" 
+                  width={1000} 
+                  height={250}
+                  className="object-contain w-full h-auto"
+                  style={{ backgroundColor: 'transparent' }}
+                  priority={false}
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-4 animate-fade-in-up relative z-10" style={{ animationDelay: '0.3s' }}>
               <Zap className="h-6 w-6 text-primary-600" />
               <p className="text-2xl md:text-3xl font-semibold text-gray-800">
                 High-Throughput 4D MRI Platform
