@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
 interface MRIViewerProps {
@@ -28,8 +28,7 @@ export default function MRIViewer({ volumePath, className = '' }: MRIViewerProps
 
   return (
     <div className={`w-full h-full bg-gray-900 rounded-lg overflow-hidden ${className}`}>
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+      <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <directionalLight position={[0, 5, 5]} intensity={1} />
