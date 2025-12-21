@@ -6,6 +6,7 @@ import { File } from 'jsfive'
 
 interface H5Viewer2DProps {
   fileUrl?: string
+  filePath?: string // 文件在Storage中的路径（用于生成signed URL）
   metadata?: {
     bbox?: {
       min_z?: number
@@ -25,13 +26,14 @@ interface H5Viewer2DProps {
   }
   className?: string
   hasPermission?: boolean
+  accessToken?: string // 用户访问token
 }
 
 type Dimension = 'x' | 'y' | 'z'
 
 const ALLOWED_EMAIL = 'chuqingz@126.com'
 
-export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermission = true }: H5Viewer2DProps) {
+export default function H5Viewer2D({ fileUrl, filePath, metadata, className = '', hasPermission = true, accessToken }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
@@ -39,6 +41,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermi
   const [zoom, setZoom] = useState(2) // 默认200%放大
   const [dimension] = useState<Dimension>('x') // 固定使用X维度（Y-Z平面）
   const [showPrediction, setShowPrediction] = useState(false)
+  const [secureFileUrl, setSecureFileUrl] = useState<string | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const h5FileRef = useRef<any>(null)
@@ -55,13 +58,56 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermi
     }
   }, [hasPermission])
 
+  // 获取安全的signed URL
+  useEffect(() => {
+    if (!hasPermission || !filePath || !accessToken) {
+      return
+    }
+
+    const fetchSecureUrl = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const response = await fetch('/api/h5-file-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            filePath,
+            accessToken,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || '获取文件URL失败')
+        }
+
+        const data = await response.json()
+        setSecureFileUrl(data.url)
+        setLoading(false)
+      } catch (err: any) {
+        console.error('Error fetching secure URL:', err)
+        setError(err.message || '获取文件访问权限失败')
+        setLoading(false)
+      }
+    }
+
+    fetchSecureUrl()
+  }, [filePath, accessToken, hasPermission])
+
   // 加载H5文件
   useEffect(() => {
-    if (!fileUrl || !hasPermission) {
+    // 优先使用secureFileUrl，如果没有则使用fileUrl（向后兼容）
+    const urlToUse = secureFileUrl || fileUrl
+
+    if (!urlToUse || !hasPermission) {
       if (!hasPermission) {
         setError('权限不足：请联系管理员开启访问权限')
-      } else {
-        setError('缺少文件 URL')
+      } else if (!filePath && !fileUrl) {
+        setError('缺少文件路径或URL')
       }
       return
     }
@@ -72,7 +118,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermi
         setError(null)
 
         // 下载H5文件
-        const response = await fetch(fileUrl)
+        const response = await fetch(urlToUse)
         if (!response.ok) {
           throw new Error(`Failed to fetch H5 file: ${response.statusText}`)
         }
@@ -92,7 +138,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermi
     }
 
     loadH5File()
-  }, [fileUrl])
+  }, [secureFileUrl, fileUrl, hasPermission])
 
   // 读取并显示切片
   useEffect(() => {

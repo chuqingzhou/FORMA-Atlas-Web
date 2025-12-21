@@ -21,9 +21,24 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
   const [trackingGroup, setTrackingGroup] = useState<OrganoidDetail[]>([])
   const [selectedFile, setSelectedFile] = useState<OrganoidFile | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
   
   // 检查是否有可视化权限
   const hasVisualizationPermission = user?.email === ALLOWED_EMAIL
+
+  // 获取访问token
+  useEffect(() => {
+    const getAccessToken = async () => {
+      const { getSession } = await import('@/lib/auth')
+      const session = await getSession()
+      if (session?.access_token) {
+        setAccessToken(session.access_token)
+      }
+    }
+    if (isAuthenticated) {
+      getAccessToken()
+    }
+  }, [isAuthenticated])
 
   // 检查认证状态
   useEffect(() => {
@@ -372,9 +387,10 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
               )}
             </div>
             <H5Viewer2D
-              fileUrl={selectedFile.metadata?.public_url}
+              filePath={selectedFile.file_path}
               metadata={selectedFile.metadata}
               hasPermission={hasVisualizationPermission}
+              accessToken={accessToken || undefined}
             />
           </div>
         )}
