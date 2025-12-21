@@ -1,0 +1,1622 @@
+[
+  {
+    "index": 1,
+    "total": 60,
+    "filename": "18-1-1.h5",
+    "storage_path": "S113W01/18-1-1.h5",
+    "file_size": 191690,
+    "subject_id": "S113W01",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 1,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1782,
+      "bbox": {
+        "min_z": 17,
+        "max_z": 56,
+        "min_y": 19,
+        "max_y": 62,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 39,
+        "y": 43,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 2,
+    "total": 60,
+    "filename": "18-1-2.h5",
+    "storage_path": "S113W02/18-1-2.h5",
+    "file_size": 221213,
+    "subject_id": "S113W02",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 2,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 3086,
+      "bbox": {
+        "min_z": 11,
+        "max_z": 59,
+        "min_y": 66,
+        "max_y": 108,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 48,
+        "y": 42,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 3,
+    "total": 60,
+    "filename": "18-1-3.h5",
+    "storage_path": "S113W03/18-1-3.h5",
+    "file_size": 194658,
+    "subject_id": "S113W03",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 3,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2125,
+      "bbox": {
+        "min_z": 15,
+        "max_z": 58,
+        "min_y": 110,
+        "max_y": 150,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 43,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 4,
+    "total": 60,
+    "filename": "18-1-4.h5",
+    "storage_path": "S113W04/18-1-4.h5",
+    "file_size": 184054,
+    "subject_id": "S113W04",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 4,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1904,
+      "bbox": {
+        "min_z": 14,
+        "max_z": 54,
+        "min_y": 153,
+        "max_y": 193,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 5,
+    "total": 60,
+    "filename": "18-1-5.h5",
+    "storage_path": "S113W05/18-1-5.h5",
+    "file_size": 166253,
+    "subject_id": "S113W05",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 5,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1366,
+      "bbox": {
+        "min_z": 17,
+        "max_z": 56,
+        "min_y": 197,
+        "max_y": 234,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 39,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 6,
+    "total": 60,
+    "filename": "18-1-6.h5",
+    "storage_path": "S113W06/18-1-6.h5",
+    "file_size": 191283,
+    "subject_id": "S113W06",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 6,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1901,
+      "bbox": {
+        "min_z": 60,
+        "max_z": 102,
+        "min_y": 21,
+        "max_y": 61,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 42,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 7,
+    "total": 60,
+    "filename": "18-1-7.h5",
+    "storage_path": "S113W07/18-1-7.h5",
+    "file_size": 177712,
+    "subject_id": "S113W07",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 7,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1533,
+      "bbox": {
+        "min_z": 62,
+        "max_z": 98,
+        "min_y": 64,
+        "max_y": 107,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 36,
+        "y": 43,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 8,
+    "total": 60,
+    "filename": "18-1-8.h5",
+    "storage_path": "S113W08/18-1-8.h5",
+    "file_size": 166459,
+    "subject_id": "S113W08",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 8,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1526,
+      "bbox": {
+        "min_z": 59,
+        "max_z": 100,
+        "min_y": 113,
+        "max_y": 149,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 41,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 9,
+    "total": 60,
+    "filename": "18-1-9.h5",
+    "storage_path": "S113W09/18-1-9.h5",
+    "file_size": 182133,
+    "subject_id": "S113W09",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 9,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1749,
+      "bbox": {
+        "min_z": 58,
+        "max_z": 98,
+        "min_y": 155,
+        "max_y": 195,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 10,
+    "total": 60,
+    "filename": "18-1-10.h5",
+    "storage_path": "S113W10/18-1-10.h5",
+    "file_size": 163859,
+    "subject_id": "S113W10",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 10,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1252,
+      "bbox": {
+        "min_z": 59,
+        "max_z": 101,
+        "min_y": 201,
+        "max_y": 235,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 42,
+        "y": 34,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 11,
+    "total": 60,
+    "filename": "18-1-11.h5",
+    "storage_path": "S113W11/18-1-11.h5",
+    "file_size": 163255,
+    "subject_id": "S113W11",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 11,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1483,
+      "bbox": {
+        "min_z": 105,
+        "max_z": 143,
+        "min_y": 24,
+        "max_y": 61,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 12,
+    "total": 60,
+    "filename": "18-1-12.h5",
+    "storage_path": "S113W12/18-1-12.h5",
+    "file_size": 183178,
+    "subject_id": "S113W12",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 12,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1463,
+      "bbox": {
+        "min_z": 104,
+        "max_z": 144,
+        "min_y": 68,
+        "max_y": 108,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 13,
+    "total": 60,
+    "filename": "18-1-13.h5",
+    "storage_path": "S113W13/18-1-13.h5",
+    "file_size": 190118,
+    "subject_id": "S113W13",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 13,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1665,
+      "bbox": {
+        "min_z": 106,
+        "max_z": 146,
+        "min_y": 111,
+        "max_y": 153,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 42,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 14,
+    "total": 60,
+    "filename": "18-1-14.h5",
+    "storage_path": "S113W14/18-1-14.h5",
+    "file_size": 148930,
+    "subject_id": "S113W14",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 14,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1112,
+      "bbox": {
+        "min_z": 106,
+        "max_z": 142,
+        "min_y": 158,
+        "max_y": 193,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 36,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 15,
+    "total": 60,
+    "filename": "18-1-15.h5",
+    "storage_path": "S113W15/18-1-15.h5",
+    "file_size": 168505,
+    "subject_id": "S113W15",
+    "metadata": {
+      "raw_data_id": "18-1",
+      "well_id": 15,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1091,
+      "bbox": {
+        "min_z": 104,
+        "max_z": 142,
+        "min_y": 197,
+        "max_y": 236,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 39,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 16,
+    "total": 60,
+    "filename": "18-2-1.h5",
+    "storage_path": "S114W01/18-2-1.h5",
+    "file_size": 198807,
+    "subject_id": "S114W01",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 1,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1917,
+      "bbox": {
+        "min_z": 11,
+        "max_z": 56,
+        "min_y": 17,
+        "max_y": 56,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 45,
+        "y": 39,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 17,
+    "total": 60,
+    "filename": "18-2-2.h5",
+    "storage_path": "S114W02/18-2-2.h5",
+    "file_size": 211030,
+    "subject_id": "S114W02",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 2,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2826,
+      "bbox": {
+        "min_z": 13,
+        "max_z": 57,
+        "min_y": 62,
+        "max_y": 105,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 44,
+        "y": 43,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 18,
+    "total": 60,
+    "filename": "18-2-3.h5",
+    "storage_path": "S114W03/18-2-3.h5",
+    "file_size": 182803,
+    "subject_id": "S114W03",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 3,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1339,
+      "bbox": {
+        "min_z": 17,
+        "max_z": 54,
+        "min_y": 107,
+        "max_y": 150,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 37,
+        "y": 43,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 19,
+    "total": 60,
+    "filename": "18-2-4.h5",
+    "storage_path": "S114W04/18-2-4.h5",
+    "file_size": 193730,
+    "subject_id": "S114W04",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 4,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1599,
+      "bbox": {
+        "min_z": 14,
+        "max_z": 57,
+        "min_y": 151,
+        "max_y": 191,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 43,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 20,
+    "total": 60,
+    "filename": "18-2-5.h5",
+    "storage_path": "S114W05/18-2-5.h5",
+    "file_size": 171174,
+    "subject_id": "S114W05",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 5,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1611,
+      "bbox": {
+        "min_z": 20,
+        "max_z": 56,
+        "min_y": 193,
+        "max_y": 235,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 36,
+        "y": 42,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 21,
+    "total": 60,
+    "filename": "18-2-6.h5",
+    "storage_path": "S114W06/18-2-6.h5",
+    "file_size": 208135,
+    "subject_id": "S114W06",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 6,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2279,
+      "bbox": {
+        "min_z": 58,
+        "max_z": 103,
+        "min_y": 14,
+        "max_y": 55,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 45,
+        "y": 41,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 22,
+    "total": 60,
+    "filename": "18-2-7.h5",
+    "storage_path": "S114W07/18-2-7.h5",
+    "file_size": 200683,
+    "subject_id": "S114W07",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 7,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1994,
+      "bbox": {
+        "min_z": 56,
+        "max_z": 99,
+        "min_y": 62,
+        "max_y": 104,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 43,
+        "y": 42,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 23,
+    "total": 60,
+    "filename": "18-2-8.h5",
+    "storage_path": "S114W08/18-2-8.h5",
+    "file_size": 228478,
+    "subject_id": "S114W08",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 8,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 3064,
+      "bbox": {
+        "min_z": 53,
+        "max_z": 100,
+        "min_y": 106,
+        "max_y": 151,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 47,
+        "y": 45,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 24,
+    "total": 60,
+    "filename": "18-2-9.h5",
+    "storage_path": "S114W09/18-2-9.h5",
+    "file_size": 193291,
+    "subject_id": "S114W09",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 9,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1731,
+      "bbox": {
+        "min_z": 59,
+        "max_z": 102,
+        "min_y": 151,
+        "max_y": 191,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 43,
+        "y": 40,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 25,
+    "total": 60,
+    "filename": "18-2-10.h5",
+    "storage_path": "S114W10/18-2-10.h5",
+    "file_size": 191332,
+    "subject_id": "S114W10",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 10,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2558,
+      "bbox": {
+        "min_z": 56,
+        "max_z": 104,
+        "min_y": 198,
+        "max_y": 233,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 48,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 26,
+    "total": 60,
+    "filename": "18-2-11.h5",
+    "storage_path": "S114W11/18-2-11.h5",
+    "file_size": 233084,
+    "subject_id": "S114W11",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 11,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 3680,
+      "bbox": {
+        "min_z": 98,
+        "max_z": 146,
+        "min_y": 15,
+        "max_y": 59,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 48,
+        "y": 44,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 27,
+    "total": 60,
+    "filename": "18-2-12.h5",
+    "storage_path": "S114W12/18-2-12.h5",
+    "file_size": 208193,
+    "subject_id": "S114W12",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 12,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2386,
+      "bbox": {
+        "min_z": 105,
+        "max_z": 146,
+        "min_y": 60,
+        "max_y": 105,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 41,
+        "y": 45,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 28,
+    "total": 60,
+    "filename": "18-2-13.h5",
+    "storage_path": "S114W13/18-2-13.h5",
+    "file_size": 192986,
+    "subject_id": "S114W13",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 13,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1763,
+      "bbox": {
+        "min_z": 102,
+        "max_z": 147,
+        "min_y": 108,
+        "max_y": 146,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 45,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 29,
+    "total": 60,
+    "filename": "18-2-14.h5",
+    "storage_path": "S114W14/18-2-14.h5",
+    "file_size": 207204,
+    "subject_id": "S114W14",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 14,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 2102,
+      "bbox": {
+        "min_z": 104,
+        "max_z": 149,
+        "min_y": 150,
+        "max_y": 191,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 45,
+        "y": 41,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 30,
+    "total": 60,
+    "filename": "18-2-15.h5",
+    "storage_path": "S114W15/18-2-15.h5",
+    "file_size": 179668,
+    "subject_id": "S114W15",
+    "metadata": {
+      "raw_data_id": "18-2",
+      "well_id": 15,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1737,
+      "bbox": {
+        "min_z": 106,
+        "max_z": 147,
+        "min_y": 194,
+        "max_y": 232,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 41,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 31,
+    "total": 60,
+    "filename": "18-3-1.h5",
+    "storage_path": "S115W01/18-3-1.h5",
+    "file_size": 144138,
+    "subject_id": "S115W01",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 1,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 684,
+      "bbox": {
+        "min_z": 11,
+        "max_z": 48,
+        "min_y": 20,
+        "max_y": 53,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 37,
+        "y": 33,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 32,
+    "total": 60,
+    "filename": "18-3-2.h5",
+    "storage_path": "S115W02/18-3-2.h5",
+    "file_size": 147041,
+    "subject_id": "S115W02",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 2,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 743,
+      "bbox": {
+        "min_z": 12,
+        "max_z": 47,
+        "min_y": 65,
+        "max_y": 101,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 35,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 33,
+    "total": 60,
+    "filename": "18-3-3.h5",
+    "storage_path": "S115W03/18-3-3.h5",
+    "file_size": 143316,
+    "subject_id": "S115W03",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 3,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 820,
+      "bbox": {
+        "min_z": 11,
+        "max_z": 46,
+        "min_y": 110,
+        "max_y": 145,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 35,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 34,
+    "total": 60,
+    "filename": "18-3-4.h5",
+    "storage_path": "S115W04/18-3-4.h5",
+    "file_size": 171440,
+    "subject_id": "S115W04",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 4,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1757,
+      "bbox": {
+        "min_z": 12,
+        "max_z": 52,
+        "min_y": 151,
+        "max_y": 189,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 35,
+    "total": 60,
+    "filename": "18-3-5.h5",
+    "storage_path": "S115W05/18-3-5.h5",
+    "file_size": 141917,
+    "subject_id": "S115W05",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 5,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 810,
+      "bbox": {
+        "min_z": 14,
+        "max_z": 48,
+        "min_y": 196,
+        "max_y": 231,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 34,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 36,
+    "total": 60,
+    "filename": "18-3-6.h5",
+    "storage_path": "S115W06/18-3-6.h5",
+    "file_size": 110519,
+    "subject_id": "S115W06",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 6,
+      "organoid_count": 0,
+      "organoid_volume_voxels": 0,
+      "bbox": {
+        "min_z": 86,
+        "max_z": 116,
+        "min_y": 21,
+        "max_y": 51,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 30,
+        "y": 30,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 37,
+    "total": 60,
+    "filename": "18-3-7.h5",
+    "storage_path": "S115W07/18-3-7.h5",
+    "file_size": 108426,
+    "subject_id": "S115W07",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 7,
+      "organoid_count": 0,
+      "organoid_volume_voxels": 0,
+      "bbox": {
+        "min_z": 86,
+        "max_z": 116,
+        "min_y": 67,
+        "max_y": 97,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 30,
+        "y": 30,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 38,
+    "total": 60,
+    "filename": "18-3-8.h5",
+    "storage_path": "S115W08/18-3-8.h5",
+    "file_size": 108091,
+    "subject_id": "S115W08",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 8,
+      "organoid_count": 0,
+      "organoid_volume_voxels": 0,
+      "bbox": {
+        "min_z": 86,
+        "max_z": 116,
+        "min_y": 111,
+        "max_y": 141,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 30,
+        "y": 30,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 39,
+    "total": 60,
+    "filename": "18-3-9.h5",
+    "storage_path": "S115W09/18-3-9.h5",
+    "file_size": 123053,
+    "subject_id": "S115W09",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 9,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 589,
+      "bbox": {
+        "min_z": 58,
+        "max_z": 90,
+        "min_y": 154,
+        "max_y": 186,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 32,
+        "y": 32,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 40,
+    "total": 60,
+    "filename": "18-3-10.h5",
+    "storage_path": "S115W10/18-3-10.h5",
+    "file_size": 150740,
+    "subject_id": "S115W10",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 10,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1002,
+      "bbox": {
+        "min_z": 58,
+        "max_z": 96,
+        "min_y": 196,
+        "max_y": 230,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 34,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 41,
+    "total": 60,
+    "filename": "18-3-11.h5",
+    "storage_path": "S115W11/18-3-11.h5",
+    "file_size": 141298,
+    "subject_id": "S115W11",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 11,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 653,
+      "bbox": {
+        "min_z": 101,
+        "max_z": 134,
+        "min_y": 18,
+        "max_y": 54,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 33,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 42,
+    "total": 60,
+    "filename": "18-3-12.h5",
+    "storage_path": "S115W12/18-3-12.h5",
+    "file_size": 112660,
+    "subject_id": "S115W12",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 12,
+      "organoid_count": 0,
+      "organoid_volume_voxels": 0,
+      "bbox": {
+        "min_z": 105,
+        "max_z": 135,
+        "min_y": 67,
+        "max_y": 97,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 30,
+        "y": 30,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 43,
+    "total": 60,
+    "filename": "18-3-13.h5",
+    "storage_path": "S115W13/18-3-13.h5",
+    "file_size": 160570,
+    "subject_id": "S115W13",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 13,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1325,
+      "bbox": {
+        "min_z": 101,
+        "max_z": 139,
+        "min_y": 108,
+        "max_y": 145,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 44,
+    "total": 60,
+    "filename": "18-3-14.h5",
+    "storage_path": "S115W14/18-3-14.h5",
+    "file_size": 150564,
+    "subject_id": "S115W14",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 14,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1065,
+      "bbox": {
+        "min_z": 103,
+        "max_z": 138,
+        "min_y": 152,
+        "max_y": 189,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 35,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 45,
+    "total": 60,
+    "filename": "18-3-15.h5",
+    "storage_path": "S115W15/18-3-15.h5",
+    "file_size": 161065,
+    "subject_id": "S115W15",
+    "metadata": {
+      "raw_data_id": "18-3",
+      "well_id": 15,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1001,
+      "bbox": {
+        "min_z": 101,
+        "max_z": 141,
+        "min_y": 196,
+        "max_y": 231,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 40,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 46,
+    "total": 60,
+    "filename": "18-4-1.h5",
+    "storage_path": "S116W01/18-4-1.h5",
+    "file_size": 153710,
+    "subject_id": "S116W01",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 1,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 637,
+      "bbox": {
+        "min_z": 19,
+        "max_z": 53,
+        "min_y": 13,
+        "max_y": 52,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 34,
+        "y": 39,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 47,
+    "total": 60,
+    "filename": "18-4-2.h5",
+    "storage_path": "S116W02/18-4-2.h5",
+    "file_size": 189446,
+    "subject_id": "S116W02",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 2,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1722,
+      "bbox": {
+        "min_z": 16,
+        "max_z": 59,
+        "min_y": 61,
+        "max_y": 100,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 43,
+        "y": 39,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 48,
+    "total": 60,
+    "filename": "18-4-3.h5",
+    "storage_path": "S116W03/18-4-3.h5",
+    "file_size": 139754,
+    "subject_id": "S116W03",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 3,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 672,
+      "bbox": {
+        "min_z": 16,
+        "max_z": 52,
+        "min_y": 108,
+        "max_y": 141,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 36,
+        "y": 33,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 49,
+    "total": 60,
+    "filename": "18-4-4.h5",
+    "storage_path": "S116W04/18-4-4.h5",
+    "file_size": 147810,
+    "subject_id": "S116W04",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 4,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1163,
+      "bbox": {
+        "min_z": 19,
+        "max_z": 55,
+        "min_y": 151,
+        "max_y": 186,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 36,
+        "y": 35,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 50,
+    "total": 60,
+    "filename": "18-4-5.h5",
+    "storage_path": "S116W05/18-4-5.h5",
+    "file_size": 161639,
+    "subject_id": "S116W05",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 5,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 950,
+      "bbox": {
+        "min_z": 21,
+        "max_z": 58,
+        "min_y": 192,
+        "max_y": 230,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 37,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 51,
+    "total": 60,
+    "filename": "18-4-6.h5",
+    "storage_path": "S116W06/18-4-6.h5",
+    "file_size": 161304,
+    "subject_id": "S116W06",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 6,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 900,
+      "bbox": {
+        "min_z": 64,
+        "max_z": 101,
+        "min_y": 14,
+        "max_y": 52,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 37,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 52,
+    "total": 60,
+    "filename": "18-4-7.h5",
+    "storage_path": "S116W07/18-4-7.h5",
+    "file_size": 73676,
+    "subject_id": "S116W07",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 7,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 14,
+      "bbox": {
+        "min_z": 26,
+        "max_z": 49,
+        "min_y": 36,
+        "max_y": 59,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 23,
+        "y": 23,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 53,
+    "total": 60,
+    "filename": "18-4-8.h5",
+    "storage_path": "S116W08/18-4-8.h5",
+    "file_size": 188411,
+    "subject_id": "S116W08",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 8,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1526,
+      "bbox": {
+        "min_z": 57,
+        "max_z": 104,
+        "min_y": 106,
+        "max_y": 142,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 47,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 54,
+    "total": 60,
+    "filename": "18-4-9.h5",
+    "storage_path": "S116W09/18-4-9.h5",
+    "file_size": 163687,
+    "subject_id": "S116W09",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 9,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1384,
+      "bbox": {
+        "min_z": 64,
+        "max_z": 103,
+        "min_y": 149,
+        "max_y": 186,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 39,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 55,
+    "total": 60,
+    "filename": "18-4-10.h5",
+    "storage_path": "S116W10/18-4-10.h5",
+    "file_size": 160887,
+    "subject_id": "S116W10",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 10,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1231,
+      "bbox": {
+        "min_z": 63,
+        "max_z": 101,
+        "min_y": 192,
+        "max_y": 229,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 37,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 56,
+    "total": 60,
+    "filename": "18-4-11.h5",
+    "storage_path": "S116W11/18-4-11.h5",
+    "file_size": 148249,
+    "subject_id": "S116W11",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 11,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1019,
+      "bbox": {
+        "min_z": 110,
+        "max_z": 145,
+        "min_y": 17,
+        "max_y": 53,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 35,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 57,
+    "total": 60,
+    "filename": "18-4-12.h5",
+    "storage_path": "S116W12/18-4-12.h5",
+    "file_size": 181098,
+    "subject_id": "S116W12",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 12,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1585,
+      "bbox": {
+        "min_z": 103,
+        "max_z": 145,
+        "min_y": 60,
+        "max_y": 98,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 42,
+        "y": 38,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 58,
+    "total": 60,
+    "filename": "18-4-13.h5",
+    "storage_path": "S116W13/18-4-13.h5",
+    "file_size": 160727,
+    "subject_id": "S116W13",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 13,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1342,
+      "bbox": {
+        "min_z": 108,
+        "max_z": 147,
+        "min_y": 107,
+        "max_y": 143,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 39,
+        "y": 36,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 59,
+    "total": 60,
+    "filename": "18-4-14.h5",
+    "storage_path": "S116W14/18-4-14.h5",
+    "file_size": 111581,
+    "subject_id": "S116W14",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 14,
+      "organoid_count": 0,
+      "organoid_volume_voxels": 0,
+      "bbox": {
+        "min_z": 111,
+        "max_z": 141,
+        "min_y": 153,
+        "max_y": 183,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 30,
+        "y": 30,
+        "x": 15
+      }
+    }
+  },
+  {
+    "index": 60,
+    "total": 60,
+    "filename": "18-4-15.h5",
+    "storage_path": "S116W15/18-4-15.h5",
+    "file_size": 168265,
+    "subject_id": "S116W15",
+    "metadata": {
+      "raw_data_id": "18-4",
+      "well_id": 15,
+      "organoid_count": 1,
+      "organoid_volume_voxels": 1264,
+      "bbox": {
+        "min_z": 107,
+        "max_z": 145,
+        "min_y": 193,
+        "max_y": 232,
+        "min_x": 0,
+        "max_x": 15
+      },
+      "shape": {
+        "z": 38,
+        "y": 39,
+        "x": 15
+      }
+    }
+  }
+]

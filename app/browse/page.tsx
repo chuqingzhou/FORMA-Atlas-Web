@@ -2,17 +2,28 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Brain, Filter, Search, FileText, Calendar } from 'lucide-react'
 import { getOrganoids, type OrganoidDetail } from '@/lib/organoid'
 import Navigation from '@/components/Navigation'
+import { useAuth } from '@/hooks/useAuth'
 
 interface BrowsePageProps {
   searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export default function BrowsePage({ searchParams }: BrowsePageProps) {
+  const router = useRouter()
+  const { user, loading: authLoading, isAuthenticated } = useAuth()
   const [organoids, setOrganoids] = useState<OrganoidDetail[]>([])
   const [loading, setLoading] = useState(true)
+
+  // 检查认证状态
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth/login')
+    }
+  }, [authLoading, isAuthenticated, router])
   const [searchTerm, setSearchTerm] = useState('')
   const [filters, setFilters] = useState({
     region: '',
@@ -25,6 +36,11 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
   }, [filters, searchTerm])
 
   async function loadOrganoids() {
+    // 如果未认证，不加载数据
+    if (!isAuthenticated) {
+      return
+    }
+    
     setLoading(true)
     try {
       const result = await getOrganoids(1, 100, {
@@ -41,7 +57,7 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative">
-      <Navigation currentPath="/browse" />
+      <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header */}
@@ -101,7 +117,24 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
 
         {/* Organoids Grid */}
-        {loading ? (
+        {authLoading ? (
+          <div className="glass-effect rounded-xl shadow-lg p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">正在验证身份...</p>
+          </div>
+        ) : !isAuthenticated ? (
+          <div className="glass-effect rounded-xl shadow-lg p-12 text-center">
+            <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">需要登录</h3>
+            <p className="text-gray-600 mb-4">请先登录以访问数据集</p>
+            <Link
+              href="/auth/login"
+              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            >
+              前往登录
+            </Link>
+          </div>
+        ) : loading ? (
           <div className="glass-effect rounded-xl shadow-lg p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading organoids...</p>

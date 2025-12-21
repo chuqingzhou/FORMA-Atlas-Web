@@ -3,20 +3,33 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import { getOrganoidDetail, getOrganoidFiles, OrganoidDetail, OrganoidFile } from '@/lib/organoid'
 import MRIViewer from '@/components/MRIViewer'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function OrganoidPage({ params }: { params: { id: string } }) {
+  const router = useRouter()
+  const { user, loading: authLoading, isAuthenticated } = useAuth()
   const [organoid, setOrganoid] = useState<OrganoidDetail | null>(null)
   const [files, setFiles] = useState<OrganoidFile[]>([])
   const [loading, setLoading] = useState(true)
   const [trackingGroup, setTrackingGroup] = useState<OrganoidDetail[]>([])
 
+  // 检查认证状态
   useEffect(() => {
-    loadData()
-  }, [params.id])
+    if (!authLoading && !isAuthenticated) {
+      router.push('/auth/login')
+    }
+  }, [authLoading, isAuthenticated, router])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData()
+    }
+  }, [params.id, isAuthenticated])
 
   async function loadData() {
     setLoading(true)
@@ -41,6 +54,41 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">正在验证身份...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <div className="text-center">
+            <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">需要登录</h1>
+            <p className="text-xl text-gray-600 mb-6">请先登录以访问类器官详情</p>
+            <Link
+              href="/auth/login"
+              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            >
+              前往登录
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
