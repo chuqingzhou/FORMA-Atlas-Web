@@ -19,14 +19,14 @@ export default function Home() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-3 group">
               <div className="relative">
-                <Image 
-                  src="/logo.png" 
-                  alt="FORMA Atlas Logo" 
-                  width={56} 
-                  height={56}
+              <Image 
+                src="/logo.png" 
+                alt="FORMA Atlas Logo" 
+                width={56} 
+                height={56}
                   className="object-contain transition-transform group-hover:scale-110"
-                  style={{ backgroundColor: 'transparent' }}
-                />
+                style={{ backgroundColor: 'transparent' }}
+              />
                 <div className="absolute inset-0 bg-primary-400 rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">FORMA Atlas</span>
@@ -55,14 +55,14 @@ export default function Home() {
           <div className="text-center relative z-10">
             <div className="flex justify-center mb-8 animate-fade-in-up">
               <div className="relative">
-                <Image 
-                  src="/logo.png" 
-                  alt="FORMA Atlas Logo" 
+              <Image 
+                src="/logo.png" 
+                alt="FORMA Atlas Logo" 
                   width={200} 
                   height={200}
                   className="object-contain animate-float"
-                  style={{ backgroundColor: 'transparent' }}
-                />
+                style={{ backgroundColor: 'transparent' }}
+              />
                 <div className="absolute inset-0 bg-primary-400 rounded-full opacity-20 blur-3xl animate-pulse-glow"></div>
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function Home() {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Sparkles className="h-6 w-6" />
-                  Explore Dataset
+                Explore Dataset
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity blur-xl"></div>
               </Link>
@@ -228,14 +228,14 @@ export default function Home() {
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
               <div className="relative">
-                <Image 
-                  src="/logo.png" 
-                  alt="FORMA Atlas Logo" 
+              <Image 
+                src="/logo.png" 
+                alt="FORMA Atlas Logo" 
                   width={48} 
                   height={48}
-                  className="object-contain"
-                  style={{ backgroundColor: 'transparent' }}
-                />
+                className="object-contain"
+                style={{ backgroundColor: 'transparent' }}
+              />
                 <div className="absolute inset-0 bg-primary-400 rounded-full opacity-20 blur-xl"></div>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">FORMA Atlas</span>
@@ -249,9 +249,9 @@ export default function Home() {
               <Link href="/about" className="text-gray-400 hover:text-white transition-colors">About</Link>
             </div>
             <div className="border-t border-gray-700/50 pt-6">
-              <p className="text-gray-500 text-sm">
-                © 2025 FORMA Atlas. All rights reserved.
-              </p>
+            <p className="text-gray-500 text-sm">
+              © 2025 FORMA Atlas. All rights reserved.
+            </p>
             </div>
           </div>
         </div>
