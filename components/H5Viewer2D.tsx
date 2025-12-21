@@ -110,7 +110,8 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
 
         const [dimZ, dimY, dimX] = shape
 
-        // 固定使用Z维度（X-Y平面，Axial视图）
+        // 固定使用X维度（Y-Z平面，Sagittal视图）
+        // 参考Python: well_raw[:, :, mid_x] 即 raw[z, y, x_index]
         let sliceRaw: Float32Array | Uint8Array
         let slicePred: Float32Array | Uint8Array | null = null
         let width: number, height: number
@@ -118,61 +119,58 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         // 读取原始数据
         const rawData = rawDataset.value as any
 
-        {
-          // Z维度：显示X-Y平面 (Z slice)
-          // 参考Python: well_raw[mid_z, :, :] 即 raw[z_index, y, x]
-          const sliceIdx = Math.min(currentSlice, dimZ - 1)
-          width = dimX
-          height = dimY
-          
-          // jsfive返回的数据是扁平化的1D数组，shape为[dimZ, dimY, dimX]
-          // 需要提取Z切片: raw[sliceIdx, :, :] -> 所有y和x，固定z=sliceIdx
-          if (rawData instanceof Float32Array || rawData instanceof Uint8Array || Array.isArray(rawData)) {
-            // 扁平化的3D数组，需要提取切片
-            sliceRaw = new Float32Array(width * height)
-            let hasData = false
-            for (let y = 0; y < height; y++) {
-              for (let x = 0; x < width; x++) {
-                // 3D索引到1D索引: [z, y, x] -> z * dimY * dimX + y * dimX + x
-                const idx3D = sliceIdx * dimY * dimX + y * dimX + x
-                const idx2D = y * width + x
-                if (idx3D < rawData.length) {
-                  sliceRaw[idx2D] = rawData[idx3D] || 0
-                  if (rawData[idx3D] !== undefined && rawData[idx3D] !== null) {
-                    hasData = true
-                  }
-                } else {
-                  sliceRaw[idx2D] = 0
+        // X维度：显示Y-Z平面 (X slice)
+        const sliceIdx = Math.min(currentSlice, dimX - 1)
+        width = dimY
+        height = dimZ
+        
+        // jsfive返回的数据是扁平化的1D数组，shape为[dimZ, dimY, dimX]
+        // 需要提取X切片: raw[:, :, sliceIdx] -> 所有z和y，固定x=sliceIdx
+        if (rawData instanceof Float32Array || rawData instanceof Uint8Array || Array.isArray(rawData)) {
+          // 扁平化的3D数组，需要提取切片
+          sliceRaw = new Float32Array(width * height)
+          let hasData = false
+          for (let z = 0; z < height; z++) {
+            for (let y = 0; y < width; y++) {
+              // 3D索引到1D索引: [z, y, x] -> z * dimY * dimX + y * dimX + x
+              const idx3D = z * dimY * dimX + y * dimX + sliceIdx
+              const idx2D = z * width + y
+              if (idx3D < rawData.length) {
+                sliceRaw[idx2D] = rawData[idx3D] || 0
+                if (rawData[idx3D] !== undefined && rawData[idx3D] !== null) {
+                  hasData = true
                 }
+              } else {
+                sliceRaw[idx2D] = 0
               }
             }
-            if (!hasData) {
-              console.warn('Z切片没有提取到有效数据，检查索引计算')
-            }
-          } else if (rawData && typeof rawData === 'object' && rawData[sliceIdx]) {
-            // 如果数据是按维度组织的数组
-            sliceRaw = rawData[sliceIdx]
-          } else {
-            throw new Error('无法读取raw数据，数据格式不正确')
           }
+          if (!hasData) {
+            console.warn('X切片没有提取到有效数据，检查索引计算')
+          }
+        } else if (rawData && typeof rawData === 'object' && rawData[sliceIdx]) {
+          // 如果数据是按维度组织的数组
+          sliceRaw = rawData[sliceIdx]
+        } else {
+          throw new Error('无法读取raw数据，数据格式不正确')
+        }
 
-          // 读取prediction数据集
-          if (showPrediction) {
-            const predDataset = h5File.get('/prediction')
-            if (predDataset) {
-              const predData = predDataset.value as any
-              if (predData instanceof Float32Array || predData instanceof Uint8Array || Array.isArray(predData)) {
-                slicePred = new Float32Array(width * height)
-                for (let y = 0; y < height; y++) {
-                  for (let x = 0; x < width; x++) {
-                    const idx3D = sliceIdx * dimY * dimX + y * dimX + x
-                    const idx2D = y * width + x
-                    slicePred[idx2D] = predData[idx3D] || 0
-                  }
+        // 读取prediction数据集
+        if (showPrediction) {
+          const predDataset = h5File.get('/prediction')
+          if (predDataset) {
+            const predData = predDataset.value as any
+            if (predData instanceof Float32Array || predData instanceof Uint8Array || Array.isArray(predData)) {
+              slicePred = new Float32Array(width * height)
+              for (let z = 0; z < height; z++) {
+                for (let y = 0; y < width; y++) {
+                  const idx3D = z * dimY * dimX + y * dimX + sliceIdx
+                  const idx2D = z * width + y
+                  slicePred[idx2D] = predData[idx3D] || 0
                 }
-              } else if (predData && typeof predData === 'object' && predData[sliceIdx]) {
-                slicePred = predData[sliceIdx]
               }
+            } else if (predData && typeof predData === 'object' && predData[sliceIdx]) {
+              slicePred = predData[sliceIdx]
             }
           }
         }
