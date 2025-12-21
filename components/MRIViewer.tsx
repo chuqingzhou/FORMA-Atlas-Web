@@ -8,9 +8,26 @@ import * as THREE from 'three'
 interface MRIViewerProps {
   volumePath?: string
   className?: string
+  metadata?: {
+    bbox?: {
+      min_z?: number
+      max_z?: number
+      min_y?: number
+      max_y?: number
+      min_x?: number
+      max_x?: number
+    }
+    shape?: {
+      z?: number
+      y?: number
+      x?: number
+    }
+    organoid_volume_voxels?: number
+    [key: string]: any
+  }
 }
 
-export default function MRIViewer({ volumePath, className = '' }: MRIViewerProps) {
+export default function MRIViewer({ volumePath, className = '', metadata }: MRIViewerProps) {
   const meshRef = useRef<THREE.Mesh>(null)
 
   useEffect(() => {
@@ -66,7 +83,15 @@ export default function MRIViewer({ volumePath, className = '' }: MRIViewerProps
       
       {!volumePath && (
         <div className="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-2 rounded text-sm">
-          Placeholder visualization - Load MRI volume data to view actual scan
+          {metadata ? 'Loading H5 volume data...' : 'Placeholder visualization - Load MRI volume data to view actual scan'}
+        </div>
+      )}
+      {volumePath && metadata && (
+        <div className="absolute bottom-4 left-4 bg-black/50 text-white px-3 py-2 rounded text-sm">
+          <div>H5 Volume Data Loaded</div>
+          {metadata.organoid_volume_voxels && (
+            <div className="text-xs mt-1">Volume: {metadata.organoid_volume_voxels.toLocaleString()} voxels</div>
+          )}
         </div>
       )}
     </div>

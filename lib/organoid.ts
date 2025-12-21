@@ -229,7 +229,7 @@ export async function getOrganoids(
   }
   if (filters?.search) {
     query = query.or(
-      `subject_id.ilike.%${filters.search}%,scan_id.ilike.%${filters.search}%,raw_data_id.ilike.%${filters.search}%`
+      `subject_id.ilike.%${filters.search}%,scan_id.ilike.%${filters.search}%,raw_data_id.ilike.%${filters.search}%,well_id.ilike.%${filters.search}%`
     )
   }
 

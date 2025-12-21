@@ -244,14 +244,29 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      {file.file_type === 'mri_volume_h5' && file.metadata?.public_url && (
+                        <button
+                          onClick={() => {
+                            // 设置当前查看的文件
+                            const h5Files = files.filter(f => f.file_type === 'mri_volume_h5')
+                            if (h5Files.length > 0) {
+                              // 滚动到可视化区域
+                              document.getElementById('mri-viewer')?.scrollIntoView({ behavior: 'smooth' })
+                            }
+                          }}
+                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                        >
+                          Visualize
+                        </button>
+                      )}
                       {file.metadata?.public_url && (
                         <a
                           href={file.metadata.public_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
                         >
-                          View
+                          Download
                         </a>
                       )}
                     </div>
@@ -263,10 +278,23 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* MRI Viewer */}
-        {files.some(f => f.file_type === 'mri_volume') && (
-          <div className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
+        {(files.some(f => f.file_type === 'mri_volume') || files.some(f => f.file_type === 'mri_volume_h5')) && (
+          <div id="mri-viewer" className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">3D Visualization</h2>
-            <MRIViewer />
+            <div className="h-96">
+              <MRIViewer 
+                volumePath={files.find(f => f.file_type === 'mri_volume_h5')?.metadata?.public_url || undefined}
+                metadata={files.find(f => f.file_type === 'mri_volume_h5')?.metadata}
+              />
+            </div>
+            {files.find(f => f.file_type === 'mri_volume_h5')?.metadata && (
+              <div className="mt-4 text-sm text-gray-600">
+                <p>File: {files.find(f => f.file_type === 'mri_volume_h5')?.file_name}</p>
+                {files.find(f => f.file_type === 'mri_volume_h5')?.metadata?.organoid_volume_voxels && (
+                  <p>Volume: {files.find(f => f.file_type === 'mri_volume_h5')?.metadata.organoid_volume_voxels} voxels</p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
