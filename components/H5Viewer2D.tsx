@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { X, ZoomIn, ZoomOut, RotateCw } from 'lucide-react'
+import { X, ZoomIn, ZoomOut } from 'lucide-react'
+import { File } from 'jsfive'
 
 interface H5Viewer2DProps {
   fileUrl?: string
@@ -33,9 +34,11 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [currentSlice, setCurrentSlice] = useState(0)
   const [zoom, setZoom] = useState(1)
-  const [dimension, setDimension] = useState<Dimension>('z') // 默认 Z 维度
+  const [dimension, setDimension] = useState<Dimension>('z')
+  const [showPrediction, setShowPrediction] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const h5FileRef = useRef<any>(null)
 
   // 根据选择的维度计算切片数量
   const getMaxSlices = (dim: Dimension): number => {
@@ -53,22 +56,6 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     }
   }
 
-  // 根据维度获取显示的尺寸
-  const getDisplayDimensions = (dim: Dimension): { width: number; height: number } => {
-    if (!metadata?.shape) return { width: 100, height: 100 }
-    
-    switch (dim) {
-      case 'x':
-        return { width: metadata.shape.y || 100, height: metadata.shape.z || 100 }
-      case 'y':
-        return { width: metadata.shape.x || 100, height: metadata.shape.z || 100 }
-      case 'z':
-        return { width: metadata.shape.x || 100, height: metadata.shape.y || 100 }
-      default:
-        return { width: 100, height: 100 }
-    }
-  }
-
   const maxSlices = getMaxSlices(dimension)
 
   // 当维度改变时，重置切片索引
@@ -76,71 +63,211 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     setCurrentSlice(0)
   }, [dimension])
 
-  const [showPrediction, setShowPrediction] = useState(false)
-
+  // 加载H5文件
   useEffect(() => {
-    if (!fileUrl || !metadata) {
-      setError('缺少文件 URL 或元数据')
+    if (!fileUrl) {
+      setError('缺少文件 URL')
       return
     }
 
-    setLoading(true)
-    setError(null)
-
-    // 从API端点获取H5切片数据
-    const fetchSliceData = async () => {
+    const loadH5File = async () => {
       try {
-        const params = new URLSearchParams({
-          fileUrl: fileUrl,
-          dimension: dimension,
-          sliceIndex: currentSlice.toString(),
-          includePrediction: showPrediction.toString(),
-        })
-        
-        const response = await fetch(`/api/h5-slice?${params}`)
-        if (!response.ok) {
-          throw new Error(`Failed to fetch slice data: ${response.statusText}`)
-        }
-        
-        const data = await response.json()
-        
-        if (data.error) {
-          throw new Error(data.error)
-        }
+        setLoading(true)
+        setError(null)
 
+        // 下载H5文件
+        const response = await fetch(fileUrl)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch H5 file: ${response.statusText}`)
+        }
+        
+        const arrayBuffer = await response.arrayBuffer()
+        
+        // 使用jsfive解析H5文件
+        const h5File = new File(arrayBuffer)
+        h5FileRef.current = h5File
+        
+        setLoading(false)
+      } catch (err: any) {
+        console.error('Error loading H5 file:', err)
+        setError(err.message || '加载H5文件失败')
+        setLoading(false)
+      }
+    }
+
+    loadH5File()
+  }, [fileUrl])
+
+  // 读取并显示切片
+  useEffect(() => {
+    if (!h5FileRef.current || !canvasRef.current || loading) {
+      return
+    }
+
+    const loadSlice = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const h5File = h5FileRef.current
         const canvas = canvasRef.current
         if (!canvas) return
 
         const ctx = canvas.getContext('2d')
         if (!ctx) return
 
-        const width = data.shape[1]
-        const height = data.shape[0]
+        // 读取raw数据集
+        const rawDataset = h5File.get('/raw')
+        if (!rawDataset) {
+          throw new Error('找不到 raw 数据集')
+        }
+
+        // 获取数据形状
+        const shape = rawDataset.shape || []
+        if (shape.length !== 3) {
+          throw new Error(`预期的3D数据，但得到 ${shape.length}D 数据`)
+        }
+
+        const [dimZ, dimY, dimX] = shape
+
+        // 根据维度提取切片
+        let sliceRaw: Float32Array | Uint8Array
+        let slicePred: Float32Array | Uint8Array | null = null
+        let width: number, height: number
+
+        if (dimension === 'z') {
+          // Z维度：显示X-Y平面 (Z slice)
+          const sliceIdx = Math.min(currentSlice, dimZ - 1)
+          width = dimX
+          height = dimY
+          
+          // 读取切片数据
+          const rawData = rawDataset.value as any
+          // jsfive返回的数据可能需要特殊处理
+          if (rawData instanceof Float32Array || rawData instanceof Uint8Array) {
+            // 如果是完整的3D数组，需要提取切片
+            sliceRaw = new Float32Array(width * height)
+            for (let y = 0; y < height; y++) {
+              for (let x = 0; x < width; x++) {
+                const idx3D = sliceIdx * dimY * dimX + y * dimX + x
+                sliceRaw[y * width + x] = rawData[idx3D]
+              }
+            }
+          } else {
+            // 如果已经是2D数组
+            sliceRaw = rawData[sliceIdx]
+          }
+
+          // 读取prediction数据集
+          if (showPrediction) {
+            const predDataset = h5File.get('/prediction')
+            if (predDataset) {
+              const predData = predDataset.value as any
+              if (predData instanceof Float32Array || predData instanceof Uint8Array) {
+                slicePred = new Float32Array(width * height)
+                for (let y = 0; y < height; y++) {
+                  for (let x = 0; x < width; x++) {
+                    const idx3D = sliceIdx * dimY * dimX + y * dimX + x
+                    slicePred[y * width + x] = predData[idx3D]
+                  }
+                }
+              } else {
+                slicePred = predData[sliceIdx]
+              }
+            }
+          }
+        } else if (dimension === 'y') {
+          // Y维度：显示X-Z平面 (Y slice)
+          const sliceIdx = Math.min(currentSlice, dimY - 1)
+          width = dimX
+          height = dimZ
+          
+          const rawData = rawDataset.value as any
+          sliceRaw = new Float32Array(width * height)
+          for (let z = 0; z < height; z++) {
+            for (let x = 0; x < width; x++) {
+              const idx3D = z * dimY * dimX + sliceIdx * dimX + x
+              sliceRaw[z * width + x] = rawData[idx3D]
+            }
+          }
+
+          if (showPrediction) {
+            const predDataset = h5File.get('/prediction')
+            if (predDataset) {
+              const predData = predDataset.value as any
+              slicePred = new Float32Array(width * height)
+              for (let z = 0; z < height; z++) {
+                for (let x = 0; x < width; x++) {
+                  const idx3D = z * dimY * dimX + sliceIdx * dimX + x
+                  slicePred[z * width + x] = predData[idx3D]
+                }
+              }
+            }
+          }
+        } else {
+          // X维度：显示Y-Z平面 (X slice)
+          const sliceIdx = Math.min(currentSlice, dimX - 1)
+          width = dimY
+          height = dimZ
+          
+          const rawData = rawDataset.value as any
+          sliceRaw = new Float32Array(width * height)
+          for (let z = 0; z < height; z++) {
+            for (let y = 0; y < width; y++) {
+              const idx3D = z * dimY * dimX + y * dimX + sliceIdx
+              sliceRaw[z * width + y] = rawData[idx3D]
+            }
+          }
+
+          if (showPrediction) {
+            const predDataset = h5File.get('/prediction')
+            if (predDataset) {
+              const predData = predDataset.value as any
+              slicePred = new Float32Array(width * height)
+              for (let z = 0; z < height; z++) {
+                for (let y = 0; y < width; y++) {
+                  const idx3D = z * dimY * dimX + y * dimX + sliceIdx
+                  slicePred[z * width + y] = predData[idx3D]
+                }
+              }
+            }
+          }
+        }
+
+        // 设置画布尺寸
         canvas.width = width
         canvas.height = height
 
         // 创建图像数据
         const imageData = ctx.createImageData(width, height)
-        const rawData = data.raw
-        
+
+        // 归一化raw数据到0-255
+        let min = Number.MAX_VALUE
+        let max = Number.MIN_VALUE
+        for (let i = 0; i < sliceRaw.length; i++) {
+          const val = sliceRaw[i]
+          if (val < min) min = val
+          if (val > max) max = val
+        }
+        const range = max - min || 1
+
         // 填充原始数据（灰度图）
-        for (let i = 0; i < rawData.length; i++) {
+        for (let i = 0; i < sliceRaw.length; i++) {
           const y = Math.floor(i / width)
           const x = i % width
           const idx = (y * width + x) * 4
-          const value = rawData[i]
+          const normalizedValue = ((sliceRaw[i] - min) / range * 255) | 0
           
-          imageData.data[idx] = value     // R
-          imageData.data[idx + 1] = value // G
-          imageData.data[idx + 2] = value // B
-          imageData.data[idx + 3] = 255   // A
+          imageData.data[idx] = normalizedValue     // R
+          imageData.data[idx + 1] = normalizedValue // G
+          imageData.data[idx + 2] = normalizedValue // B
+          imageData.data[idx + 3] = 255             // A
         }
 
         // 如果有预测数据，叠加红色半透明的预测mask
-        if (showPrediction && data.prediction) {
-          const predData = data.prediction
-          for (let i = 0; i < predData.length; i++) {
-            if (predData[i] > 128) { // 预测区域
+        if (showPrediction && slicePred) {
+          for (let i = 0; i < slicePred.length; i++) {
+            if (slicePred[i] > 0.5) { // 预测区域阈值
               const y = Math.floor(i / width)
               const x = i % width
               const idx = (y * width + x) * 4
@@ -157,26 +284,14 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         setImageData(imageData)
         setLoading(false)
       } catch (err: any) {
-        console.error('Error loading H5 slice:', err)
-        // 提取更详细的错误信息
-        let errorMessage = err.message || '加载H5数据失败'
-        
-        // 如果错误信息包含Python相关的内容，提供更友好的提示
-        if (errorMessage.includes('python') || errorMessage.includes('Python')) {
-          errorMessage = '服务器端Python环境配置问题。请联系管理员检查Python和h5py库是否已安装。'
-        } else if (errorMessage.includes('404') || errorMessage.includes('Not Found')) {
-          errorMessage = 'H5文件未找到。请检查文件URL是否正确。'
-        } else if (errorMessage.includes('timeout')) {
-          errorMessage = '请求超时。文件可能太大，请稍后重试。'
-        }
-        
-        setError(errorMessage)
+        console.error('Error loading slice:', err)
+        setError(err.message || '加载切片数据失败')
         setLoading(false)
       }
     }
 
-    fetchSliceData()
-  }, [fileUrl, metadata, currentSlice, maxSlices, dimension, showPrediction])
+    loadSlice()
+  }, [fileUrl, currentSlice, maxSlices, dimension, showPrediction, loading])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -294,7 +409,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
               <p className="text-lg font-semibold mb-2">Error</p>
               <p>{error}</p>
               <p className="text-sm mt-4 text-gray-400">
-                请检查H5文件URL是否正确，以及服务器是否支持Python和h5py库。
+                请检查H5文件URL是否正确，以及文件格式是否支持。
               </p>
             </div>
           </div>
@@ -349,4 +464,3 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     </div>
   )
 }
-
