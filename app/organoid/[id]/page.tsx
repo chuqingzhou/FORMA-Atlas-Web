@@ -290,20 +290,40 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                     </div>
                     {file.file_type === 'mri_volume_h5' && file.metadata?.public_url && (
                       <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setSelectedFile(file)
-                            // 滚动到可视化区域
-                            setTimeout(() => {
-                              document.getElementById('h5-viewer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            }, 100)
-                          }}
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
-                        >
-                          Visualize
-                        </button>
+                        {hasVisualizationPermission ? (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setSelectedFile(file)
+                              // 滚动到可视化区域
+                              setTimeout(() => {
+                                document.getElementById('h5-viewer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                              }, 100)
+                            }}
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                          >
+                            Visualize
+                          </button>
+                        ) : (
+                          <div className="relative group">
+                            <button
+                              disabled
+                              className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed text-sm opacity-60"
+                            >
+                              Visualize
+                            </button>
+                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 border border-gray-200">
+                              <p className="text-sm font-semibold text-gray-900 mb-2">权限不足</p>
+                              <p className="text-xs text-gray-600 mb-2">
+                                您没有权限查看可视化内容。
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                请联系管理员 <a href={`mailto:${ALLOWED_EMAIL}`} className="text-primary-600 hover:underline">{ALLOWED_EMAIL}</a> 开启访问权限。
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
