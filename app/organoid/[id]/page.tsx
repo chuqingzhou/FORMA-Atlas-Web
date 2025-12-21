@@ -239,8 +239,8 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                         <span>{new Date(file.uploaded_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      {file.file_type === 'mri_volume_h5' && file.metadata?.public_url && (
+                    {file.file_type === 'mri_volume_h5' && file.metadata?.public_url && (
+                      <div className="flex gap-2">
                         <button
                           onClick={() => {
                             // 设置当前查看的文件
@@ -254,18 +254,8 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                         >
                           Visualize
                         </button>
-                      )}
-                      {file.metadata?.public_url && (
-                        <a
-                          href={file.metadata.public_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-                        >
-                          Download
-                        </a>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
