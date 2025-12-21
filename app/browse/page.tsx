@@ -32,8 +32,11 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
   })
 
   useEffect(() => {
-    loadOrganoids()
-  }, [filters, searchTerm])
+    // 只有在认证完成后才加载数据
+    if (!authLoading && isAuthenticated) {
+      loadOrganoids()
+    }
+  }, [filters, searchTerm, authLoading, isAuthenticated])
 
   async function loadOrganoids() {
     // 如果未认证，不加载数据

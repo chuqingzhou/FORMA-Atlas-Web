@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon } from 'lucide-react'
+import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon, X } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import { getOrganoidDetail, getOrganoidFiles, OrganoidDetail, OrganoidFile } from '@/lib/organoid'
 import MRIViewer from '@/components/MRIViewer'
+import H5Viewer2D from '@/components/H5Viewer2D'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function OrganoidPage({ params }: { params: { id: string } }) {
@@ -17,6 +18,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
   const [files, setFiles] = useState<OrganoidFile[]>([])
   const [loading, setLoading] = useState(true)
   const [trackingGroup, setTrackingGroup] = useState<OrganoidDetail[]>([])
+  const [selectedFile, setSelectedFile] = useState<OrganoidFile | null>(null)
 
   // 检查认证状态
   useEffect(() => {
@@ -290,13 +292,14 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                     {file.file_type === 'mri_volume_h5' && file.metadata?.public_url && (
                       <div className="flex gap-2">
                         <button
-                          onClick={() => {
-                            // 设置当前查看的文件
-                            const h5Files = files.filter(f => f.file_type === 'mri_volume_h5')
-                            if (h5Files.length > 0) {
-                              // 滚动到可视化区域
-                              document.getElementById('mri-viewer')?.scrollIntoView({ behavior: 'smooth' })
-                            }
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setSelectedFile(file)
+                            // 滚动到可视化区域
+                            setTimeout(() => {
+                              document.getElementById('h5-viewer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                            }, 100)
                           }}
                           className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
                         >
@@ -311,24 +314,58 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
           )}
         </div>
 
-        {/* MRI Viewer */}
-        {(files.some(f => f.file_type === 'mri_volume') || files.some(f => f.file_type === 'mri_volume_h5')) && (
+        {/* H5 Viewer 2D */}
+        {selectedFile && selectedFile.file_type === 'mri_volume_h5' && (
+          <div id="h5-viewer" className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">2D Visualization</h2>
+              <button
+                onClick={() => setSelectedFile(null)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Close viewer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mb-4 text-sm text-gray-600">
+              <p className="font-semibold">File: {selectedFile.file_name}</p>
+              {selectedFile.metadata && (
+                <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {selectedFile.metadata.organoid_volume_voxels && (
+                    <div>
+                      <span className="text-gray-500">Volume: </span>
+                      <span className="font-medium">{selectedFile.metadata.organoid_volume_voxels.toLocaleString()} voxels</span>
+                    </div>
+                  )}
+                  {selectedFile.metadata.shape && (
+                    <div>
+                      <span className="text-gray-500">Dimensions: </span>
+                      <span className="font-medium">{selectedFile.metadata.shape.x} × {selectedFile.metadata.shape.y} × {selectedFile.metadata.shape.z}</span>
+                    </div>
+                  )}
+                  {selectedFile.metadata.organoid_count !== undefined && (
+                    <div>
+                      <span className="text-gray-500">Organoids: </span>
+                      <span className="font-medium">{selectedFile.metadata.organoid_count}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <H5Viewer2D
+              fileUrl={selectedFile.metadata?.public_url}
+              metadata={selectedFile.metadata}
+            />
+          </div>
+        )}
+
+        {/* MRI Viewer 3D (保留作为占位符) */}
+        {files.some(f => f.file_type === 'mri_volume') && !selectedFile && (
           <div id="mri-viewer" className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">3D Visualization</h2>
             <div className="h-96">
-              <MRIViewer 
-                volumePath={files.find(f => f.file_type === 'mri_volume_h5')?.metadata?.public_url || undefined}
-                metadata={files.find(f => f.file_type === 'mri_volume_h5')?.metadata}
-              />
+              <MRIViewer />
             </div>
-            {files.find(f => f.file_type === 'mri_volume_h5')?.metadata && (
-              <div className="mt-4 text-sm text-gray-600">
-                <p>File: {files.find(f => f.file_type === 'mri_volume_h5')?.file_name}</p>
-                {files.find(f => f.file_type === 'mri_volume_h5')?.metadata?.organoid_volume_voxels && (
-                  <p>Volume: {files.find(f => f.file_type === 'mri_volume_h5')?.metadata.organoid_volume_voxels} voxels</p>
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
