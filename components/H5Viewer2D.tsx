@@ -34,34 +34,14 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [currentSlice, setCurrentSlice] = useState(0)
   const [zoom, setZoom] = useState(1)
-  const [dimension, setDimension] = useState<Dimension>('z')
+  const [dimension] = useState<Dimension>('z') // 固定使用Z维度（X-Y平面）
   const [showPrediction, setShowPrediction] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const h5FileRef = useRef<any>(null)
 
-  // 根据选择的维度计算切片数量
-  const getMaxSlices = (dim: Dimension): number => {
-    if (!metadata?.shape) return 1
-    
-    switch (dim) {
-      case 'x':
-        return metadata.shape.x || 1
-      case 'y':
-        return metadata.shape.y || 1
-      case 'z':
-        return metadata.shape.z || 1
-      default:
-        return 1
-    }
-  }
-
-  const maxSlices = getMaxSlices(dimension)
-
-  // 当维度改变时，重置切片索引
-  useEffect(() => {
-    setCurrentSlice(0)
-  }, [dimension])
+  // 固定使用Z维度，计算切片数量
+  const maxSlices = metadata?.shape?.z || 1
 
   // 加载H5文件
   useEffect(() => {
@@ -104,7 +84,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
       return
     }
 
-    const loadSlice = async () => {
+        const loadSlice = async () => {
       try {
         setLoading(true)
         setError(null)
@@ -130,7 +110,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
 
         const [dimZ, dimY, dimX] = shape
 
-        // 根据维度提取切片
+        // 固定使用Z维度（X-Y平面，Axial视图）
         let sliceRaw: Float32Array | Uint8Array
         let slicePred: Float32Array | Uint8Array | null = null
         let width: number, height: number
@@ -138,7 +118,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         // 读取原始数据
         const rawData = rawDataset.value as any
 
-        if (dimension === 'z') {
+        {
           // Z维度：显示X-Y平面 (Z slice)
           // 参考Python: well_raw[mid_z, :, :] 即 raw[z_index, y, x]
           const sliceIdx = Math.min(currentSlice, dimZ - 1)
@@ -192,62 +172,6 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
                 }
               } else if (predData && typeof predData === 'object' && predData[sliceIdx]) {
                 slicePred = predData[sliceIdx]
-              }
-            }
-          }
-        } else if (dimension === 'y') {
-          // Y维度：显示X-Z平面 (Y slice)
-          const sliceIdx = Math.min(currentSlice, dimY - 1)
-          width = dimX
-          height = dimZ
-          
-          const rawData = rawDataset.value as any
-          sliceRaw = new Float32Array(width * height)
-          for (let z = 0; z < height; z++) {
-            for (let x = 0; x < width; x++) {
-              const idx3D = z * dimY * dimX + sliceIdx * dimX + x
-              sliceRaw[z * width + x] = rawData[idx3D]
-            }
-          }
-
-          if (showPrediction) {
-            const predDataset = h5File.get('/prediction')
-            if (predDataset) {
-              const predData = predDataset.value as any
-              slicePred = new Float32Array(width * height)
-              for (let z = 0; z < height; z++) {
-                for (let x = 0; x < width; x++) {
-                  const idx3D = z * dimY * dimX + sliceIdx * dimX + x
-                  slicePred[z * width + x] = predData[idx3D]
-                }
-              }
-            }
-          }
-        } else {
-          // X维度：显示Y-Z平面 (X slice)
-          const sliceIdx = Math.min(currentSlice, dimX - 1)
-          width = dimY
-          height = dimZ
-          
-          const rawData = rawDataset.value as any
-          sliceRaw = new Float32Array(width * height)
-          for (let z = 0; z < height; z++) {
-            for (let y = 0; y < width; y++) {
-              const idx3D = z * dimY * dimX + y * dimX + sliceIdx
-              sliceRaw[z * width + y] = rawData[idx3D]
-            }
-          }
-
-          if (showPrediction) {
-            const predDataset = h5File.get('/prediction')
-            if (predDataset) {
-              const predData = predDataset.value as any
-              slicePred = new Float32Array(width * height)
-              for (let z = 0; z < height; z++) {
-                for (let y = 0; y < width; y++) {
-                  const idx3D = z * dimY * dimX + y * dimX + sliceIdx
-                  slicePred[z * width + y] = predData[idx3D]
-                }
               }
             }
           }
@@ -310,7 +234,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     }
 
     loadSlice()
-  }, [fileUrl, currentSlice, maxSlices, dimension, showPrediction])
+  }, [fileUrl, currentSlice, maxSlices, showPrediction])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -329,24 +253,10 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   }
 
   return (
-    <div className={`bg-gray-900 rounded-lg overflow-hidden ${className}`} ref={containerRef}>
+    <div className={`bg-gray-900 rounded-lg overflow-hidden max-w-4xl mx-auto ${className}`} ref={containerRef}>
       {/* 工具栏 */}
       <div className="bg-gray-800 px-4 py-2 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          {/* 维度选择 */}
-          <div className="flex items-center gap-2">
-            <span className="text-white text-sm">Dimension:</span>
-            <select
-              value={dimension}
-              onChange={(e) => setDimension(e.target.value as Dimension)}
-              className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm border border-gray-600"
-            >
-              <option value="x">X (Y-Z plane)</option>
-              <option value="y">Y (X-Z plane)</option>
-              <option value="z">Z (X-Y plane)</option>
-            </select>
-          </div>
-          
           {/* 切片导航 */}
           <div className="flex items-center gap-2">
             <button
@@ -357,7 +267,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
               ←
             </button>
             <span className="text-white text-sm min-w-[120px] text-center">
-              {dimension.toUpperCase()} Slice {currentSlice + 1} / {maxSlices}
+              Slice {currentSlice + 1} / {maxSlices}
             </span>
             <button
               onClick={handleNextSlice}
@@ -412,7 +322,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
       </div>
 
       {/* 画布容器 */}
-      <div className="relative bg-black flex items-center justify-center" style={{ height: '600px' }}>
+      <div className="relative bg-black flex items-center justify-center" style={{ height: '500px' }}>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="text-white">
@@ -463,7 +373,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
                 </div>
                 <div>
                   <span className="text-gray-400">Viewing: </span>
-                  {dimension.toUpperCase()}-dimension ({dimension === 'x' ? 'Y-Z plane' : dimension === 'y' ? 'X-Z plane' : 'X-Y plane'})
+                  Axial (X-Y plane)
                 </div>
                 {metadata.bbox && (
                   <div>
