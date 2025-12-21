@@ -180,12 +180,6 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
                     <dd className="text-gray-900 font-medium">{organoid.scan_id}</dd>
                   </div>
                 )}
-                {organoid.raw_data_id && (
-                  <div className="flex justify-between">
-                    <dt className="text-gray-500">Raw Data ID:</dt>
-                    <dd className="text-gray-900 font-medium">{organoid.raw_data_id}</dd>
-                  </div>
-                )}
                 {organoid.well_id && (
                   <div className="flex justify-between">
                     <dt className="text-gray-500">Well ID:</dt>
