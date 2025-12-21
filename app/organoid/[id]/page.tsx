@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon, Upload } from 'lucide-react'
+import { Brain, ArrowLeft, Calendar, FileText, Tag, Link as LinkIcon } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import { getOrganoidDetail, getOrganoidFiles, OrganoidDetail, OrganoidFile } from '@/lib/organoid'
 import MRIViewer from '@/components/MRIViewer'
@@ -214,11 +214,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
           {files.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">No files available for this organoid.</p>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-                <Upload className="h-4 w-4" />
-                Upload Files
-              </button>
+              <p className="text-gray-600">No files available for this organoid.</p>
             </div>
           ) : (
             <div className="space-y-4">
