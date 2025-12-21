@@ -21,28 +21,45 @@ export async function GET(request: NextRequest) {
 
     // 调用Python脚本读取H5文件
     const scriptPath = path.join(process.cwd(), 'scripts', 'read_h5_slice.py')
-    const command = `python3 "${scriptPath}" "${fileUrl}" "${dimension}" "${sliceIndex}" "${includePrediction}"`
+    // 转义URL中的特殊字符，避免shell注入
+    const escapedUrl = fileUrl.replace(/"/g, '\\"').replace(/\$/g, '\\$').replace(/`/g, '\\`')
+    const command = `python3 "${scriptPath}" "${escapedUrl}" "${dimension}" "${sliceIndex}" "${includePrediction}"`
     
     try {
       const { stdout, stderr } = await execAsync(command, { 
-        maxBuffer: 50 * 1024 * 1024 // 50MB buffer for large JSON responses
+        maxBuffer: 50 * 1024 * 1024, // 50MB buffer for large JSON responses
+        timeout: 60000 // 60秒超时
       })
       
-      if (stderr) {
+      if (stderr && !stderr.includes('WARNING')) {
         console.error('Python script stderr:', stderr)
       }
       
-      const result = JSON.parse(stdout)
+      // 尝试解析JSON
+      let result
+      try {
+        result = JSON.parse(stdout)
+      } catch (parseError) {
+        console.error('Failed to parse Python script output:', stdout.substring(0, 500))
+        return NextResponse.json({ 
+          error: `Failed to parse response from Python script. Output: ${stdout.substring(0, 200)}` 
+        }, { status: 500 })
+      }
       
       if (result.error) {
+        console.error('Python script error:', result.error)
         return NextResponse.json({ error: result.error }, { status: 500 })
       }
       
       return NextResponse.json(result)
     } catch (execError: any) {
       console.error('Error executing Python script:', execError)
+      // 提供更详细的错误信息
+      const errorMessage = execError.stderr 
+        ? `Failed to read H5 file: ${execError.message}. Python error: ${execError.stderr.substring(0, 200)}`
+        : `Failed to read H5 file: ${execError.message}`
       return NextResponse.json({ 
-        error: `Failed to read H5 file: ${execError.message}` 
+        error: errorMessage
       }, { status: 500 })
     }
   } catch (error: any) {

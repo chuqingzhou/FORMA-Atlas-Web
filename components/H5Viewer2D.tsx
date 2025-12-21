@@ -158,7 +158,19 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         setLoading(false)
       } catch (err: any) {
         console.error('Error loading H5 slice:', err)
-        setError(err.message || '加载H5数据失败')
+        // 提取更详细的错误信息
+        let errorMessage = err.message || '加载H5数据失败'
+        
+        // 如果错误信息包含Python相关的内容，提供更友好的提示
+        if (errorMessage.includes('python') || errorMessage.includes('Python')) {
+          errorMessage = '服务器端Python环境配置问题。请联系管理员检查Python和h5py库是否已安装。'
+        } else if (errorMessage.includes('404') || errorMessage.includes('Not Found')) {
+          errorMessage = 'H5文件未找到。请检查文件URL是否正确。'
+        } else if (errorMessage.includes('timeout')) {
+          errorMessage = '请求超时。文件可能太大，请稍后重试。'
+        }
+        
+        setError(errorMessage)
         setLoading(false)
       }
     }
@@ -282,8 +294,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
               <p className="text-lg font-semibold mb-2">Error</p>
               <p>{error}</p>
               <p className="text-sm mt-4 text-gray-400">
-                Note: H5 file visualization requires server-side processing.
-                This is a placeholder implementation.
+                请检查H5文件URL是否正确，以及服务器是否支持Python和h5py库。
               </p>
             </div>
           </div>
