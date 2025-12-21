@@ -76,60 +76,95 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     setCurrentSlice(0)
   }, [dimension])
 
+  const [showPrediction, setShowPrediction] = useState(false)
+
   useEffect(() => {
     if (!fileUrl || !metadata) {
       setError('缺少文件 URL 或元数据')
       return
     }
 
-    // 由于 H5 文件需要特殊的库来解析，这里先创建一个占位符可视化
-    // 实际实现需要使用 h5py 或类似的库在服务端处理
     setLoading(true)
     setError(null)
 
-    // 模拟加载（实际应该加载 H5 文件并提取切片）
-    setTimeout(() => {
-      // 创建一个简单的测试图像（实际应该从 H5 文件加载）
-      const canvas = canvasRef.current
-      if (canvas) {
-        const ctx = canvas.getContext('2d')
-        if (ctx) {
-          const { width, height } = getDisplayDimensions(dimension)
-          canvas.width = width
-          canvas.height = height
-
-          // 创建一个简单的测试模式，根据维度显示不同的模式
-          const imageData = ctx.createImageData(width, height)
-          for (let i = 0; i < imageData.data.length; i += 4) {
-            const x = (i / 4) % width
-            const y = Math.floor((i / 4) / width)
-            const slicePos = currentSlice / maxSlices
-            
-            // 根据维度创建不同的可视化模式
-            let value = 128
-            if (dimension === 'x') {
-              // X 维度：显示 Y-Z 平面
-              value = Math.sin((y / height + slicePos) * Math.PI * 4) * Math.cos((x / width) * Math.PI * 2) * 127 + 128
-            } else if (dimension === 'y') {
-              // Y 维度：显示 X-Z 平面
-              value = Math.sin((x / width + slicePos) * Math.PI * 4) * Math.cos((y / height) * Math.PI * 2) * 127 + 128
-            } else {
-              // Z 维度：显示 X-Y 平面（默认）
-              value = Math.sin((x / width + slicePos) * Math.PI * 4) * 127 + 128
-            }
-            
-            imageData.data[i] = value     // R
-            imageData.data[i + 1] = value // G
-            imageData.data[i + 2] = value // B
-            imageData.data[i + 3] = 255   // A
-          }
-          ctx.putImageData(imageData, 0, 0)
-          setImageData(imageData)
+    // 从API端点获取H5切片数据
+    const fetchSliceData = async () => {
+      try {
+        const params = new URLSearchParams({
+          fileUrl: fileUrl,
+          dimension: dimension,
+          sliceIndex: currentSlice.toString(),
+          includePrediction: showPrediction.toString(),
+        })
+        
+        const response = await fetch(`/api/h5-slice?${params}`)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch slice data: ${response.statusText}`)
         }
+        
+        const data = await response.json()
+        
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        const canvas = canvasRef.current
+        if (!canvas) return
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+
+        const width = data.shape[1]
+        const height = data.shape[0]
+        canvas.width = width
+        canvas.height = height
+
+        // 创建图像数据
+        const imageData = ctx.createImageData(width, height)
+        const rawData = data.raw
+        
+        // 填充原始数据（灰度图）
+        for (let i = 0; i < rawData.length; i++) {
+          const y = Math.floor(i / width)
+          const x = i % width
+          const idx = (y * width + x) * 4
+          const value = rawData[i]
+          
+          imageData.data[idx] = value     // R
+          imageData.data[idx + 1] = value // G
+          imageData.data[idx + 2] = value // B
+          imageData.data[idx + 3] = 255   // A
+        }
+
+        // 如果有预测数据，叠加红色半透明的预测mask
+        if (showPrediction && data.prediction) {
+          const predData = data.prediction
+          for (let i = 0; i < predData.length; i++) {
+            if (predData[i] > 128) { // 预测区域
+              const y = Math.floor(i / width)
+              const x = i % width
+              const idx = (y * width + x) * 4
+              
+              // 叠加红色，半透明
+              imageData.data[idx] = Math.min(255, imageData.data[idx] * 0.7 + 200 * 0.3)     // R
+              imageData.data[idx + 1] = Math.min(255, imageData.data[idx + 1] * 0.7)         // G
+              imageData.data[idx + 2] = Math.min(255, imageData.data[idx + 2] * 0.7)         // B
+            }
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0)
+        setImageData(imageData)
+        setLoading(false)
+      } catch (err: any) {
+        console.error('Error loading H5 slice:', err)
+        setError(err.message || '加载H5数据失败')
+        setLoading(false)
       }
-      setLoading(false)
-    }, 300)
-  }, [fileUrl, metadata, currentSlice, maxSlices, dimension])
+    }
+
+    fetchSliceData()
+  }, [fileUrl, metadata, currentSlice, maxSlices, dimension, showPrediction])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -207,12 +242,27 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
-        </div>
-        {metadata?.organoid_volume_voxels && (
-          <div className="text-white text-sm">
-            Volume: {metadata.organoid_volume_voxels.toLocaleString()} voxels
+          
+          {/* 显示/隐藏预测叠加 */}
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showPrediction}
+                onChange={(e) => setShowPrediction(e.target.checked)}
+                className="rounded border-gray-600 bg-gray-700 text-red-500 focus:ring-red-500"
+              />
+              <span>Show Prediction</span>
+            </label>
           </div>
-        )}
+        </div>
+        <div className="flex items-center gap-4">
+          {metadata?.organoid_volume_voxels && (
+            <div className="text-white text-sm">
+              Volume: {metadata.organoid_volume_voxels.toLocaleString()} voxels
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 画布容器 */}
