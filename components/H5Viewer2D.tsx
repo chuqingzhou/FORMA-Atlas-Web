@@ -135,27 +135,45 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         let slicePred: Float32Array | Uint8Array | null = null
         let width: number, height: number
 
+        // 读取原始数据
+        const rawData = rawDataset.value as any
+
         if (dimension === 'z') {
           // Z维度：显示X-Y平面 (Z slice)
+          // 参考Python: well_raw[mid_z, :, :] 即 raw[z_index, y, x]
           const sliceIdx = Math.min(currentSlice, dimZ - 1)
           width = dimX
           height = dimY
           
-          // 读取切片数据
-          const rawData = rawDataset.value as any
-          // jsfive返回的数据可能需要特殊处理
-          if (rawData instanceof Float32Array || rawData instanceof Uint8Array) {
-            // 如果是完整的3D数组，需要提取切片
+          // jsfive返回的数据是扁平化的1D数组，shape为[dimZ, dimY, dimX]
+          // 需要提取Z切片: raw[sliceIdx, :, :] -> 所有y和x，固定z=sliceIdx
+          if (rawData instanceof Float32Array || rawData instanceof Uint8Array || Array.isArray(rawData)) {
+            // 扁平化的3D数组，需要提取切片
             sliceRaw = new Float32Array(width * height)
+            let hasData = false
             for (let y = 0; y < height; y++) {
               for (let x = 0; x < width; x++) {
+                // 3D索引到1D索引: [z, y, x] -> z * dimY * dimX + y * dimX + x
                 const idx3D = sliceIdx * dimY * dimX + y * dimX + x
-                sliceRaw[y * width + x] = rawData[idx3D]
+                const idx2D = y * width + x
+                if (idx3D < rawData.length) {
+                  sliceRaw[idx2D] = rawData[idx3D] || 0
+                  if (rawData[idx3D] !== undefined && rawData[idx3D] !== null) {
+                    hasData = true
+                  }
+                } else {
+                  sliceRaw[idx2D] = 0
+                }
               }
             }
-          } else {
-            // 如果已经是2D数组
+            if (!hasData) {
+              console.warn('Z切片没有提取到有效数据，检查索引计算')
+            }
+          } else if (rawData && typeof rawData === 'object' && rawData[sliceIdx]) {
+            // 如果数据是按维度组织的数组
             sliceRaw = rawData[sliceIdx]
+          } else {
+            throw new Error('无法读取raw数据，数据格式不正确')
           }
 
           // 读取prediction数据集
@@ -163,15 +181,16 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
             const predDataset = h5File.get('/prediction')
             if (predDataset) {
               const predData = predDataset.value as any
-              if (predData instanceof Float32Array || predData instanceof Uint8Array) {
+              if (predData instanceof Float32Array || predData instanceof Uint8Array || Array.isArray(predData)) {
                 slicePred = new Float32Array(width * height)
                 for (let y = 0; y < height; y++) {
                   for (let x = 0; x < width; x++) {
                     const idx3D = sliceIdx * dimY * dimX + y * dimX + x
-                    slicePred[y * width + x] = predData[idx3D]
+                    const idx2D = y * width + x
+                    slicePred[idx2D] = predData[idx3D] || 0
                   }
                 }
-              } else {
+              } else if (predData && typeof predData === 'object' && predData[sliceIdx]) {
                 slicePred = predData[sliceIdx]
               }
             }
