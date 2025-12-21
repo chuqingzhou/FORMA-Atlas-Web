@@ -100,7 +100,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
 
   // 读取并显示切片
   useEffect(() => {
-    if (!h5FileRef.current || !canvasRef.current || loading) {
+    if (!h5FileRef.current || !canvasRef.current) {
       return
     }
 
@@ -291,7 +291,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
     }
 
     loadSlice()
-  }, [fileUrl, currentSlice, maxSlices, dimension, showPrediction, loading])
+  }, [fileUrl, currentSlice, maxSlices, dimension, showPrediction])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
