@@ -33,15 +33,15 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [currentSlice, setCurrentSlice] = useState(0)
-  const [zoom, setZoom] = useState(1)
-  const [dimension] = useState<Dimension>('z') // 固定使用Z维度（X-Y平面）
+  const [zoom, setZoom] = useState(2) // 默认200%放大
+  const [dimension] = useState<Dimension>('x') // 固定使用X维度（Y-Z平面）
   const [showPrediction, setShowPrediction] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const h5FileRef = useRef<any>(null)
 
-  // 固定使用Z维度，计算切片数量
-  const maxSlices = metadata?.shape?.z || 1
+  // 固定使用X维度，计算切片数量
+  const maxSlices = metadata?.shape?.x || 1
 
   // 加载H5文件
   useEffect(() => {
@@ -253,7 +253,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   }
 
   return (
-    <div className={`bg-gray-900 rounded-lg overflow-hidden max-w-4xl mx-auto ${className}`} ref={containerRef}>
+    <div className={`bg-gray-900 rounded-lg overflow-hidden max-w-2xl mx-auto ${className}`} ref={containerRef}>
       {/* 工具栏 */}
       <div className="bg-gray-800 px-4 py-2 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
@@ -373,7 +373,7 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
                 </div>
                 <div>
                   <span className="text-gray-400">Viewing: </span>
-                  Axial (X-Y plane)
+                  Sagittal (Y-Z plane)
                 </div>
                 {metadata.bbox && (
                   <div>
