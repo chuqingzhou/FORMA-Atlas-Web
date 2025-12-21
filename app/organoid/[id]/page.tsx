@@ -388,6 +388,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
             </div>
             <H5Viewer2D
               filePath={selectedFile.file_path}
+              fileUrl={selectedFile.metadata?.public_url} // 保留作为fallback
               metadata={selectedFile.metadata}
               hasPermission={hasVisualizationPermission}
               accessToken={accessToken || undefined}

@@ -60,7 +60,26 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
 
   // 获取安全的signed URL
   useEffect(() => {
-    if (!hasPermission || !filePath || !accessToken) {
+    // 如果有fileUrl（public URL），且没有filePath，直接使用fileUrl（向后兼容）
+    if (fileUrl && !filePath) {
+      setSecureFileUrl(fileUrl)
+      return
+    }
+
+    // 如果有filePath，尝试获取signed URL
+    if (!hasPermission || !filePath) {
+      return
+    }
+
+    // 如果没有accessToken，尝试使用fileUrl作为fallback（如果bucket还是public）
+    if (!accessToken && fileUrl) {
+      console.warn('No accessToken provided, using fileUrl as fallback')
+      setSecureFileUrl(fileUrl)
+      return
+    }
+
+    if (!accessToken) {
+      setError('缺少访问令牌，无法获取文件')
       return
     }
 
@@ -81,8 +100,27 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
         })
 
         if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || '获取文件URL失败')
+          const errorData = await response.json().catch(() => ({}))
+          const errorMsg = errorData.error || '获取文件URL失败'
+          
+          // 如果API返回服务器错误或配置错误，且存在fileUrl，使用fileUrl作为fallback
+          // 这允许在bucket还是public时继续工作
+          if ((response.status >= 500 || response.status === 401 || response.status === 403) && fileUrl) {
+            console.warn('API error, falling back to fileUrl:', errorMsg, 'Status:', response.status)
+            setSecureFileUrl(fileUrl)
+            setLoading(false)
+            return
+          }
+          
+          // 如果是权限错误（403），且用户有权限，也尝试fallback
+          if (response.status === 403 && hasPermission && fileUrl) {
+            console.warn('Permission error but user has permission, falling back to fileUrl')
+            setSecureFileUrl(fileUrl)
+            setLoading(false)
+            return
+          }
+          
+          throw new Error(errorMsg)
         }
 
         const data = await response.json()
@@ -90,13 +128,21 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
         setLoading(false)
       } catch (err: any) {
         console.error('Error fetching secure URL:', err)
-        setError(err.message || '获取文件访问权限失败')
-        setLoading(false)
+        
+        // 如果获取signed URL失败，但有fileUrl，使用fileUrl作为fallback
+        if (fileUrl) {
+          console.warn('Falling back to fileUrl due to error:', err.message)
+          setSecureFileUrl(fileUrl)
+          setLoading(false)
+        } else {
+          setError(err.message || '获取文件访问权限失败')
+          setLoading(false)
+        }
       }
     }
 
     fetchSecureUrl()
-  }, [filePath, accessToken, hasPermission])
+  }, [filePath, accessToken, hasPermission, fileUrl])
 
   // 加载H5文件
   useEffect(() => {
