@@ -25,17 +25,56 @@ interface H5Viewer2DProps {
   className?: string
 }
 
+type Dimension = 'x' | 'y' | 'z'
+
 export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [currentSlice, setCurrentSlice] = useState(0)
   const [zoom, setZoom] = useState(1)
+  const [dimension, setDimension] = useState<Dimension>('z') // 默认 Z 维度
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // 计算切片数量（使用 shape.z 或 bbox）
-  const maxSlices = metadata?.shape?.z || metadata?.bbox ? (metadata.bbox?.max_z || 0) - (metadata.bbox?.min_z || 0) + 1 : 1
+  // 根据选择的维度计算切片数量
+  const getMaxSlices = (dim: Dimension): number => {
+    if (!metadata?.shape) return 1
+    
+    switch (dim) {
+      case 'x':
+        return metadata.shape.x || 1
+      case 'y':
+        return metadata.shape.y || 1
+      case 'z':
+        return metadata.shape.z || 1
+      default:
+        return 1
+    }
+  }
+
+  // 根据维度获取显示的尺寸
+  const getDisplayDimensions = (dim: Dimension): { width: number; height: number } => {
+    if (!metadata?.shape) return { width: 100, height: 100 }
+    
+    switch (dim) {
+      case 'x':
+        return { width: metadata.shape.y || 100, height: metadata.shape.z || 100 }
+      case 'y':
+        return { width: metadata.shape.x || 100, height: metadata.shape.z || 100 }
+      case 'z':
+        return { width: metadata.shape.x || 100, height: metadata.shape.y || 100 }
+      default:
+        return { width: 100, height: 100 }
+    }
+  }
+
+  const maxSlices = getMaxSlices(dimension)
+
+  // 当维度改变时，重置切片索引
+  useEffect(() => {
+    setCurrentSlice(0)
+  }, [dimension])
 
   useEffect(() => {
     if (!fileUrl || !metadata) {
@@ -55,18 +94,30 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
       if (canvas) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
-          const width = metadata.shape?.x || 100
-          const height = metadata.shape?.y || 100
+          const { width, height } = getDisplayDimensions(dimension)
           canvas.width = width
           canvas.height = height
 
-          // 创建一个简单的测试模式
+          // 创建一个简单的测试模式，根据维度显示不同的模式
           const imageData = ctx.createImageData(width, height)
           for (let i = 0; i < imageData.data.length; i += 4) {
             const x = (i / 4) % width
             const y = Math.floor((i / 4) / width)
             const slicePos = currentSlice / maxSlices
-            const value = Math.sin((x / width + slicePos) * Math.PI * 4) * 127 + 128
+            
+            // 根据维度创建不同的可视化模式
+            let value = 128
+            if (dimension === 'x') {
+              // X 维度：显示 Y-Z 平面
+              value = Math.sin((y / height + slicePos) * Math.PI * 4) * Math.cos((x / width) * Math.PI * 2) * 127 + 128
+            } else if (dimension === 'y') {
+              // Y 维度：显示 X-Z 平面
+              value = Math.sin((x / width + slicePos) * Math.PI * 4) * Math.cos((y / height) * Math.PI * 2) * 127 + 128
+            } else {
+              // Z 维度：显示 X-Y 平面（默认）
+              value = Math.sin((x / width + slicePos) * Math.PI * 4) * 127 + 128
+            }
+            
             imageData.data[i] = value     // R
             imageData.data[i + 1] = value // G
             imageData.data[i + 2] = value // B
@@ -77,8 +128,8 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         }
       }
       setLoading(false)
-    }, 500)
-  }, [fileUrl, metadata, currentSlice, maxSlices])
+    }, 300)
+  }, [fileUrl, metadata, currentSlice, maxSlices, dimension])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -99,8 +150,23 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   return (
     <div className={`bg-gray-900 rounded-lg overflow-hidden ${className}`} ref={containerRef}>
       {/* 工具栏 */}
-      <div className="bg-gray-800 px-4 py-2 flex items-center justify-between">
+      <div className="bg-gray-800 px-4 py-2 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
+          {/* 维度选择 */}
+          <div className="flex items-center gap-2">
+            <span className="text-white text-sm">Dimension:</span>
+            <select
+              value={dimension}
+              onChange={(e) => setDimension(e.target.value as Dimension)}
+              className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm border border-gray-600"
+            >
+              <option value="x">X (Y-Z plane)</option>
+              <option value="y">Y (X-Z plane)</option>
+              <option value="z">Z (X-Y plane)</option>
+            </select>
+          </div>
+          
+          {/* 切片导航 */}
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrevSlice}
@@ -109,8 +175,8 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
             >
               ←
             </button>
-            <span className="text-white text-sm min-w-[100px] text-center">
-              Slice {currentSlice + 1} / {maxSlices}
+            <span className="text-white text-sm min-w-[120px] text-center">
+              {dimension.toUpperCase()} Slice {currentSlice + 1} / {maxSlices}
             </span>
             <button
               onClick={handleNextSlice}
@@ -120,6 +186,8 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
               →
             </button>
           </div>
+          
+          {/* 缩放控制 */}
           <div className="flex items-center gap-2">
             <button
               onClick={handleZoomOut}
@@ -197,6 +265,10 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
                 <div>
                   <span className="text-gray-400">Size: </span>
                   {metadata.shape.x} × {metadata.shape.y} × {metadata.shape.z}
+                </div>
+                <div>
+                  <span className="text-gray-400">Viewing: </span>
+                  {dimension.toUpperCase()}-dimension ({dimension === 'x' ? 'Y-Z plane' : dimension === 'y' ? 'X-Z plane' : 'X-Y plane'})
                 </div>
                 {metadata.bbox && (
                   <div>
