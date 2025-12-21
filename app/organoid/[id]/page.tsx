@@ -11,6 +11,8 @@ import MRIViewer from '@/components/MRIViewer'
 import H5Viewer2D from '@/components/H5Viewer2D'
 import { useAuth } from '@/hooks/useAuth'
 
+const ALLOWED_EMAIL = 'chuqingz@126.com'
+
 export default function OrganoidPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { user, loading: authLoading, isAuthenticated } = useAuth()
@@ -19,6 +21,9 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true)
   const [trackingGroup, setTrackingGroup] = useState<OrganoidDetail[]>([])
   const [selectedFile, setSelectedFile] = useState<OrganoidFile | null>(null)
+  
+  // 检查是否有可视化权限
+  const hasVisualizationPermission = user?.email === ALLOWED_EMAIL
 
   // 检查认证状态
   useEffect(() => {
@@ -309,7 +314,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
         </div>
 
         {/* H5 Viewer 2D */}
-        {selectedFile && selectedFile.file_type === 'mri_volume_h5' && (
+        {selectedFile && selectedFile.file_type === 'mri_volume_h5' && hasVisualizationPermission && (
           <div id="h5-viewer" className="glass-effect rounded-xl shadow-lg p-8 border border-gray-200/50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">2D Visualization</h2>
@@ -349,6 +354,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
             <H5Viewer2D
               fileUrl={selectedFile.metadata?.public_url}
               metadata={selectedFile.metadata}
+              hasPermission={hasVisualizationPermission}
             />
           </div>
         )}

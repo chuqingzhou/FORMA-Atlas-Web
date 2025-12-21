@@ -24,11 +24,14 @@ interface H5Viewer2DProps {
     [key: string]: any
   }
   className?: string
+  hasPermission?: boolean
 }
 
 type Dimension = 'x' | 'y' | 'z'
 
-export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5Viewer2DProps) {
+const ALLOWED_EMAIL = 'chuqingz@126.com'
+
+export default function H5Viewer2D({ fileUrl, metadata, className = '', hasPermission = true }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
@@ -43,10 +46,23 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
   // 固定使用X维度，计算切片数量
   const maxSlices = metadata?.shape?.x || 1
 
+  // 检查权限
+  useEffect(() => {
+    if (!hasPermission) {
+      setError('权限不足：请联系管理员开启访问权限')
+      setLoading(false)
+      return
+    }
+  }, [hasPermission])
+
   // 加载H5文件
   useEffect(() => {
-    if (!fileUrl) {
-      setError('缺少文件 URL')
+    if (!fileUrl || !hasPermission) {
+      if (!hasPermission) {
+        setError('权限不足：请联系管理员开启访问权限')
+      } else {
+        setError('缺少文件 URL')
+      }
       return
     }
 
@@ -231,8 +247,10 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
       }
     }
 
-    loadSlice()
-  }, [fileUrl, currentSlice, maxSlices, showPrediction])
+    if (hasPermission) {
+      loadSlice()
+    }
+  }, [fileUrl, currentSlice, maxSlices, showPrediction, hasPermission])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -333,11 +351,18 @@ export default function H5Viewer2D({ fileUrl, metadata, className = '' }: H5View
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="text-red-400 text-center px-4">
-              <p className="text-lg font-semibold mb-2">Error</p>
-              <p>{error}</p>
-              <p className="text-sm mt-4 text-gray-400">
-                请检查H5文件URL是否正确，以及文件格式是否支持。
-              </p>
+              <p className="text-lg font-semibold mb-2">权限不足</p>
+              <p className="mb-4">{error}</p>
+              {!hasPermission && (
+                <p className="text-sm mt-4 text-gray-300">
+                  请联系管理员 <a href={`mailto:${ALLOWED_EMAIL}`} className="text-blue-400 hover:underline">{ALLOWED_EMAIL}</a> 开启访问权限。
+                </p>
+              )}
+              {hasPermission && (
+                <p className="text-sm mt-4 text-gray-400">
+                  请检查H5文件URL是否正确，以及文件格式是否支持。
+                </p>
+              )}
             </div>
           </div>
         )}
