@@ -34,9 +34,11 @@ function Model({ url }: { url: string }) {
 export default function MorphologyGLBPreview({
   className = '',
   url = '/showcase/morphology_example.glb',
+  interactive = false,
 }: {
   className?: string
   url?: string
+  interactive?: boolean
 }) {
   return (
     <div className={`relative h-56 w-full overflow-hidden rounded-2xl bg-gradient-to-br from-gray-950 to-black ${className}`}>
@@ -55,7 +57,13 @@ export default function MorphologyGLBPreview({
           </group>
         </Suspense>
 
-        <OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={1.2} />
+        <OrbitControls
+          enablePan={false}
+          enableZoom={interactive}
+          enableRotate
+          autoRotate={!interactive}
+          autoRotateSpeed={1.2}
+        />
       </Canvas>
 
       <div className="pointer-events-none absolute inset-0 ring-1 ring-white/10" />
