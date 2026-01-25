@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, useGLTF } from '@react-three/drei'
+import { Bounds, Center, OrbitControls, useGLTF } from '@react-three/drei'
 import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -52,9 +52,14 @@ export default function MorphologyGLBPreview({
         <pointLight position={[-3, -2, -2]} intensity={0.7} />
 
         <Suspense fallback={null}>
-          <group position={[0, -0.25, 0]}>
-            <Model url={url} />
-          </group>
+          {/* 自动居中 + 自动适配相机，避免模型在视野外导致“黑屏” */}
+          <Bounds fit clip observe margin={1.2}>
+            <Center>
+              <group position={[0, -0.25, 0]}>
+                <Model url={url} />
+              </group>
+            </Center>
+          </Bounds>
         </Suspense>
 
         <OrbitControls
@@ -63,6 +68,7 @@ export default function MorphologyGLBPreview({
           enableRotate
           autoRotate={!interactive}
           autoRotateSpeed={1.2}
+          makeDefault
         />
       </Canvas>
 

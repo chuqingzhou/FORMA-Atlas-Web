@@ -27,27 +27,40 @@ interface H5Viewer2DProps {
   className?: string
   hasPermission?: boolean
   accessToken?: string // 用户访问token
+  defaultShowPrediction?: boolean
+  defaultShowLabel?: boolean
 }
 
 type Dimension = 'x' | 'y' | 'z'
 
 const ALLOWED_EMAIL = 'chuqingz@126.com'
 
-export default function H5Viewer2D({ fileUrl, filePath, metadata, className = '', hasPermission = true, accessToken }: H5Viewer2DProps) {
+export default function H5Viewer2D({
+  fileUrl,
+  filePath,
+  metadata,
+  className = '',
+  hasPermission = true,
+  accessToken,
+  defaultShowPrediction = false,
+  defaultShowLabel = false,
+}: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
   const [currentSlice, setCurrentSlice] = useState(0)
   const [zoom, setZoom] = useState(2) // 默认200%放大
   const [dimension] = useState<Dimension>('x') // 固定使用X维度（Y-Z平面）
-  const [showPrediction, setShowPrediction] = useState(false)
+  const [showPrediction, setShowPrediction] = useState(defaultShowPrediction)
+  const [showLabel, setShowLabel] = useState(defaultShowLabel)
   const [secureFileUrl, setSecureFileUrl] = useState<string | null>(null)
+  const [dataShape, setDataShape] = useState<{ z: number; y: number; x: number } | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const h5FileRef = useRef<any>(null)
 
   // 固定使用X维度，计算切片数量
-  const maxSlices = metadata?.shape?.x || 1
+  const maxSlices = metadata?.shape?.x || dataShape?.x || 1
 
   // 检查权限
   useEffect(() => {
@@ -217,11 +230,13 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
         }
 
         const [dimZ, dimY, dimX] = shape
+        setDataShape({ z: dimZ, y: dimY, x: dimX })
 
         // 固定使用X维度（Y-Z平面，Sagittal视图）
         // 参考Python: well_raw[:, :, mid_x] 即 raw[z, y, x_index]
         let sliceRaw: Float32Array | Uint8Array
         let slicePred: Float32Array | Uint8Array | null = null
+        let sliceLabel: Float32Array | Uint8Array | null = null
         let width: number, height: number
 
         // 读取原始数据
@@ -283,6 +298,26 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
           }
         }
 
+        // 读取label/ground truth数据集
+        if (showLabel) {
+          const labelDataset = h5File.get('/label')
+          if (labelDataset) {
+            const labelData = labelDataset.value as any
+            if (labelData instanceof Float32Array || labelData instanceof Uint8Array || Array.isArray(labelData)) {
+              sliceLabel = new Float32Array(width * height)
+              for (let z = 0; z < height; z++) {
+                for (let y = 0; y < width; y++) {
+                  const idx3D = z * dimY * dimX + y * dimX + sliceIdx
+                  const idx2D = z * width + y
+                  sliceLabel[idx2D] = labelData[idx3D] || 0
+                }
+              }
+            } else if (labelData && typeof labelData === 'object' && labelData[sliceIdx]) {
+              sliceLabel = labelData[sliceIdx]
+            }
+          }
+        }
+
         // 设置画布尺寸
         canvas.width = width
         canvas.height = height
@@ -329,6 +364,21 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
           }
         }
 
+        // 叠加ground truth（绿色）
+        if (showLabel && sliceLabel) {
+          for (let i = 0; i < sliceLabel.length; i++) {
+            if (sliceLabel[i] > 0.5) {
+              const y = Math.floor(i / width)
+              const x = i % width
+              const idx = (y * width + x) * 4
+
+              imageData.data[idx] = Math.min(255, imageData.data[idx] * 0.7) // R
+              imageData.data[idx + 1] = Math.min(255, imageData.data[idx + 1] * 0.7 + 200 * 0.3) // G
+              imageData.data[idx + 2] = Math.min(255, imageData.data[idx + 2] * 0.7) // B
+            }
+          }
+        }
+
         ctx.putImageData(imageData, 0, 0)
         setImageData(imageData)
         setLoading(false)
@@ -342,7 +392,7 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
     if (hasPermission) {
       loadSlice()
     }
-  }, [fileUrl, currentSlice, maxSlices, showPrediction, hasPermission])
+  }, [fileUrl, currentSlice, maxSlices, showPrediction, showLabel, hasPermission])
 
   const handleZoomIn = () => {
     setZoom(prev => Math.min(prev + 0.25, 3))
@@ -361,7 +411,7 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
   }
 
   return (
-    <div className={`bg-gray-900 rounded-lg overflow-hidden max-w-2xl mx-auto ${className}`} ref={containerRef}>
+    <div className={`bg-gray-900 rounded-lg overflow-hidden ${className}`} ref={containerRef}>
       {/* 工具栏 */}
       <div className="bg-gray-800 px-4 py-2 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
@@ -407,7 +457,7 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
             </button>
           </div>
           
-          {/* 显示/隐藏预测叠加 */}
+          {/* 显示/隐藏叠加 */}
           <div className="flex items-center gap-2">
             <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
               <input
@@ -416,7 +466,16 @@ export default function H5Viewer2D({ fileUrl, filePath, metadata, className = ''
                 onChange={(e) => setShowPrediction(e.target.checked)}
                 className="rounded border-gray-600 bg-gray-700 text-red-500 focus:ring-red-500"
               />
-              <span>Show Prediction</span>
+              <span>Prediction</span>
+            </label>
+            <label className="flex items-center gap-2 text-white text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showLabel}
+                onChange={(e) => setShowLabel(e.target.checked)}
+                className="rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500"
+              />
+              <span>Ground Truth</span>
             </label>
           </div>
         </div>
