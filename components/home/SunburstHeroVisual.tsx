@@ -15,8 +15,9 @@ export default function SunburstHeroVisual({
         title="Atlas statistics sunburst"
         src={src}
         className="absolute inset-0 h-full w-full"
-        // 允许 HTML 内部的 D3/JS 脚本运行；同源以便正常加载静态资源
-        sandbox="allow-scripts allow-same-origin"
+        // 直接同源嵌入（保证 Plotly 交互/缩放/hover 在首页内完整可用）
+        // 注意：该 HTML 来自本仓库静态文件，不涉及外部不可信来源
+        scrolling="no"
       />
 
       {/* overlays：统一科技感边框/暗角 */}
