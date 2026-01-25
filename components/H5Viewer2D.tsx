@@ -29,6 +29,7 @@ interface H5Viewer2DProps {
   accessToken?: string // 用户访问token
   defaultShowPrediction?: boolean
   defaultShowLabel?: boolean
+  onSliceChange?: (sliceIndex: number) => void
 }
 
 type Dimension = 'x' | 'y' | 'z'
@@ -44,6 +45,7 @@ export default function H5Viewer2D({
   accessToken,
   defaultShowPrediction = false,
   defaultShowLabel = false,
+  onSliceChange,
 }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -409,6 +411,10 @@ export default function H5Viewer2D({
   const handlePrevSlice = () => {
     setCurrentSlice(prev => Math.max(prev - 1, 0))
   }
+
+  useEffect(() => {
+    onSliceChange?.(currentSlice)
+  }, [currentSlice, onSliceChange])
 
   return (
     <div className={`bg-gray-900 rounded-lg overflow-hidden ${className}`} ref={containerRef}>

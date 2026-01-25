@@ -2,6 +2,7 @@
 
 import H5Viewer2D from '@/components/H5Viewer2D'
 import { useState } from 'react'
+import H5Reconstruction3D from '@/components/home/H5Reconstruction3D'
 
 export default function ImageComparisonSlider({ className = '' }: { className?: string }) {
   const OPTIONS = [
@@ -24,6 +25,7 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
 
   const [selectedKey, setSelectedKey] = useState<(typeof OPTIONS)[number]['key']>('cerebral')
   const selected = OPTIONS.find((o) => o.key === selectedKey) || OPTIONS[0]
+  const [sliceIndex, setSliceIndex] = useState(0)
 
   return (
     <div className={`glass-effect rounded-3xl border border-white/30 overflow-hidden ${className}`}>
@@ -55,12 +57,20 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
       </div>
 
       <div className="px-6 pb-6 pt-4">
-        <H5Viewer2D
-          fileUrl={selected.fileUrl}
-          defaultShowPrediction
-          defaultShowLabel
-          className="w-full"
-        />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <H5Viewer2D
+            fileUrl={selected.fileUrl}
+            defaultShowPrediction
+            defaultShowLabel
+            className="w-full"
+            onSliceChange={setSliceIndex}
+          />
+          <H5Reconstruction3D
+            fileUrl={selected.fileUrl}
+            sliceIndex={sliceIndex}
+            mode="pred"
+          />
+        </div>
       </div>
     </div>
   )
