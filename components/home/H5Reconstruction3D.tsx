@@ -1,7 +1,7 @@
 'use client'
 
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { ContactShadows, Environment, OrbitControls } from '@react-three/drei'
 import { useEffect, useMemo, useState } from 'react'
 import { File } from 'jsfive'
 import * as THREE from 'three'
@@ -97,6 +97,55 @@ function PointsCloud({
   return <points geometry={geometry} material={material} />
 }
 
+function InstancedSpheres({
+  positions,
+  color = '#38bdf8',
+}: {
+  positions: Float32Array
+  color?: string
+}) {
+  const count = Math.floor(positions.length / 3)
+  const geometry = useMemo(() => new THREE.SphereGeometry(0.018, 6, 6), [])
+  const material = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color,
+        metalness: 0.15,
+        roughness: 0.45,
+        transparent: true,
+        opacity: 0.95,
+      }),
+    [color]
+  )
+
+  const mesh = useMemo(() => {
+    const m = new THREE.InstancedMesh(geometry, material, count)
+    m.castShadow = true
+    m.receiveShadow = false
+    return m
+  }, [geometry, material, count])
+
+  useEffect(() => {
+    const tmp = new THREE.Object3D()
+    for (let i = 0; i < count; i++) {
+      tmp.position.set(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2])
+      tmp.updateMatrix()
+      mesh.setMatrixAt(i, tmp.matrix)
+    }
+    mesh.instanceMatrix.needsUpdate = true
+  }, [mesh, positions, count])
+
+  useEffect(() => {
+    return () => {
+      mesh.dispose()
+      geometry.dispose()
+      material.dispose()
+    }
+  }, [mesh, geometry, material])
+
+  return <primitive object={mesh} />
+}
+
 function SlicePlane({
   shape,
   sliceX,
@@ -188,7 +237,8 @@ export default function H5Reconstruction3D({
           mask,
           shape: nextShape,
           threshold: thr,
-          maxPoints: 90000,
+          // InstancedMesh 过多会卡，限制点数用于“有光影”的体积感展示
+          maxPoints: 25000,
         })
 
         if (cancelled) return
@@ -229,12 +279,43 @@ export default function H5Reconstruction3D({
       )}
 
       <div className="h-[500px]">
-        <Canvas camera={{ position: [2.2, 1.6, 2.2], fov: 50 }} dpr={[1, 2]} gl={{ antialias: true }}>
-          <ambientLight intensity={0.7} />
-          <directionalLight position={[4, 4, 4]} intensity={1.2} />
+        <Canvas
+          shadows
+          camera={{ position: [2.2, 1.6, 2.2], fov: 50 }}
+          dpr={[1, 2]}
+          gl={{ antialias: true }}
+        >
+          <color attach="background" args={['#05070b']} />
+          <fog attach="fog" args={['#05070b', 2.6, 7.5]} />
 
-          {positions && <PointsCloud positions={positions} />}
+          <ambientLight intensity={0.35} />
+          <hemisphereLight intensity={0.4} groundColor="#0b1220" />
+          <directionalLight
+            position={[4, 5, 3]}
+            intensity={1.5}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-near={0.5}
+            shadow-camera-far={20}
+            shadow-camera-left={-3}
+            shadow-camera-right={3}
+            shadow-camera-top={3}
+            shadow-camera-bottom={-3}
+          />
+          <Environment preset="city" />
+
+          {positions && <InstancedSpheres positions={positions} />}
           {shape && <SlicePlane shape={shape} sliceX={sliceIndex} />}
+
+          {/* 地面阴影，增强体积感 */}
+          <ContactShadows
+            position={[0, -1.05, 0]}
+            opacity={0.35}
+            blur={2.5}
+            far={2.5}
+            scale={6}
+          />
 
           <OrbitControls enablePan={false} enableZoom enableRotate />
         </Canvas>
