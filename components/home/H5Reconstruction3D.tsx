@@ -14,7 +14,7 @@ function buildPointCloudFromMask(args: {
   threshold?: number
   maxPoints?: number
 }) {
-  const { mask, shape, threshold = 127, maxPoints = 90000 } = args
+  const { mask, shape, threshold = 0, maxPoints = 90000 } = args
   const dimZ = shape.z
   const dimY = shape.y
   const dimX = shape.x
@@ -25,11 +25,11 @@ function buildPointCloudFromMask(args: {
 
   const positions: number[] = []
 
-  // 归一化到 [-0.5, 0.5] 并做各向同性缩放，避免 y 维过大
-  const sx = 1 / Math.max(1, dimX)
-  const sy = 1 / Math.max(1, dimY)
-  const sz = 1 / Math.max(1, dimZ)
-  const scale = 1 / Math.max(sx, sy, sz)
+  // 映射到固定大小的包围盒（约 [-0.9, 0.9]），避免点云跑出相机视野
+  const dimMax = Math.max(dimX, dimY, dimZ)
+  const halfX = 0.9 * (dimX / dimMax)
+  const halfY = 0.9 * (dimY / dimMax)
+  const halfZ = 0.9 * (dimZ / dimMax)
 
   for (let z = 0; z < dimZ; z += step) {
     for (let y = 0; y < dimY; y += step) {
@@ -37,10 +37,16 @@ function buildPointCloudFromMask(args: {
       for (let x = 0; x < dimX; x += step) {
         const v = mask[base + x] as number
         if (v > threshold) {
-          const nx = (x / (dimX - 1) - 0.5) * scale
-          const ny = (y / (dimY - 1) - 0.5) * scale
-          const nz = (z / (dimZ - 1) - 0.5) * scale
-          positions.push(nx, nz, ny) // 交换一下轴：看起来更符合“竖直为z”
+          const tx = dimX <= 1 ? 0 : x / (dimX - 1)
+          const ty = dimY <= 1 ? 0 : y / (dimY - 1)
+          const tz = dimZ <= 1 ? 0 : z / (dimZ - 1)
+
+          const nx = (tx - 0.5) * 2 * halfX
+          const ny = (ty - 0.5) * 2 * halfY
+          const nz = (tz - 0.5) * 2 * halfZ
+
+          // 坐标系：X=原x，Y=原z，Z=原y（更接近“竖直为z”的观感）
+          positions.push(nx, nz, ny)
           if (positions.length / 3 >= maxPoints) {
             return new Float32Array(positions)
           }
@@ -100,11 +106,16 @@ function SlicePlane({
 }) {
   const dimX = Math.max(1, shape.x)
   const t = dimX <= 1 ? 0 : sliceX / (dimX - 1)
-  const xPos = (t - 0.5) * 1.8 // 经验值：与点云 scale 相匹配
+  const dimMax = Math.max(shape.x, shape.y, shape.z)
+  const halfX = 0.9 * (shape.x / dimMax)
+  const halfY = 0.9 * (shape.y / dimMax)
+  const halfZ = 0.9 * (shape.z / dimMax)
+  const xPos = (t - 0.5) * 2 * halfX
 
   return (
-    <mesh position={[xPos, 0, 0]}>
-      <planeGeometry args={[1.8, 1.8, 1, 1]} />
+    <mesh position={[xPos, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+      {/* 旋转使平面法向量沿 X（切片面为 Y-Z） */}
+      <planeGeometry args={[2 * halfY, 2 * halfZ, 1, 1]} />
       <meshBasicMaterial color="#ffffff" transparent opacity={0.08} side={THREE.DoubleSide} />
     </mesh>
   )
@@ -125,6 +136,7 @@ export default function H5Reconstruction3D({
   const [error, setError] = useState<string | null>(null)
   const [shape, setShape] = useState<VolumeShape | null>(null)
   const [positions, setPositions] = useState<Float32Array | null>(null)
+  const pointsCount = positions ? Math.floor(positions.length / 3) : 0
 
   useEffect(() => {
     let cancelled = false
@@ -161,10 +173,21 @@ export default function H5Reconstruction3D({
           throw new Error('Unsupported mask data format')
         }
 
+        // pred/gt 有的文件是 0/1，有的是 0/255；自适应选择阈值
+        let maxVal = 0
+        const sampleN = 4096
+        const stepSample = Math.max(1, Math.floor((mask.length || 1) / sampleN))
+        for (let i = 0; i < (mask.length || 0); i += stepSample) {
+          const v = mask[i] as number
+          if (v > maxVal) maxVal = v
+          if (maxVal >= 255) break
+        }
+        const thr = maxVal <= 1 ? 0 : 127
+
         const pts = buildPointCloudFromMask({
           mask,
           shape: nextShape,
-          threshold: 127,
+          threshold: thr,
           maxPoints: 90000,
         })
 
@@ -189,6 +212,9 @@ export default function H5Reconstruction3D({
     <div className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-gray-950 to-black ${className}`}>
       <div className="absolute left-3 top-3 z-10 rounded-lg bg-black/55 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
         3D Reconstruction ({mode.toUpperCase()})
+      </div>
+      <div className="absolute right-3 top-3 z-10 rounded-lg bg-black/55 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur">
+        points: {pointsCount.toLocaleString()}
       </div>
 
       {loading && (
