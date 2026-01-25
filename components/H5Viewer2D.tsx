@@ -278,9 +278,9 @@ export default function H5Viewer2D({
           throw new Error('无法读取raw数据，数据格式不正确')
         }
 
-        // 读取prediction数据集
+        // 读取 prediction 数据集（兼容 /prediction 与 /pred）
         if (showPrediction) {
-          const predDataset = h5File.get('/prediction')
+          const predDataset = h5File.get('/pred') || h5File.get('/prediction')
           if (predDataset) {
             const predData = predDataset.value as any
             if (predData instanceof Float32Array || predData instanceof Uint8Array || Array.isArray(predData)) {
@@ -298,9 +298,9 @@ export default function H5Viewer2D({
           }
         }
 
-        // 读取label/ground truth数据集
+        // 读取 label / ground truth 数据集（兼容 /label 与 /gt）
         if (showLabel) {
-          const labelDataset = h5File.get('/label')
+          const labelDataset = h5File.get('/gt') || h5File.get('/label')
           if (labelDataset) {
             const labelData = labelDataset.value as any
             if (labelData instanceof Float32Array || labelData instanceof Uint8Array || Array.isArray(labelData)) {
