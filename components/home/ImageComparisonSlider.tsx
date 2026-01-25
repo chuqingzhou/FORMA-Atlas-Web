@@ -1,31 +1,28 @@
 'use client'
 
 import H5Viewer2D from '@/components/H5Viewer2D'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 export default function ImageComparisonSlider({ className = '' }: { className?: string }) {
-  const OPTIONS = useMemo(
-    () => [
-      {
-        key: 'cerebral_3_4',
-        label: 'Cerebral · 3-4',
-        fileUrl: '/showcase/3-4_raw_pred_gt.h5',
-      },
-      {
-        key: 'mge_17_13',
-        label: 'MGE · 17-13',
-        fileUrl: '/showcase/17-13_raw_pred_gt.h5',
-      },
-      {
-        key: 'cerebral_3_1',
-        label: 'Cerebral · 3-1',
-        fileUrl: '/showcase/3-1_raw_pred_gt.h5',
-      },
-    ] as const,
-    []
-  )
+  const OPTIONS = [
+    {
+      key: 'cerebral',
+      label: 'Cerebral',
+      fileUrl: '/showcase/3-4_raw_pred_gt.h5',
+    },
+    {
+      key: 'mge',
+      label: 'MGE',
+      fileUrl: '/showcase/17-13_raw_pred_gt.h5',
+    },
+    {
+      key: 'midbrain',
+      label: 'Midbrain',
+      fileUrl: '/showcase/3-1_raw_pred_gt.h5',
+    },
+  ] as const
 
-  const [selectedKey, setSelectedKey] = useState<(typeof OPTIONS)[number]['key']>(OPTIONS[0].key)
+  const [selectedKey, setSelectedKey] = useState<(typeof OPTIONS)[number]['key']>('cerebral')
   const selected = OPTIONS.find((o) => o.key === selectedKey) || OPTIONS[0]
 
   return (
@@ -35,20 +32,24 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
           <div className="text-lg font-bold text-gray-900">Before & After</div>
           <div className="flex items-center gap-3">
             <div className="text-sm text-gray-600">raw / pred / gt（H5 交互切片）</div>
-            <label className="text-sm text-gray-600">
-              <span className="sr-only">选择脑区</span>
-              <select
-                value={selectedKey}
-                onChange={(e) => setSelectedKey(e.target.value as any)}
-                className="ml-2 rounded-lg border border-gray-200 bg-white/70 px-3 py-1.5 text-sm text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-              >
-                {OPTIONS.map((opt) => (
-                  <option key={opt.key} value={opt.key}>
+            <div className="inline-flex rounded-xl border border-gray-200 bg-white/60 p-1 shadow-sm">
+              {OPTIONS.map((opt) => {
+                const active = opt.key === selectedKey
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setSelectedKey(opt.key)}
+                    className={[
+                      'px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors',
+                      active ? 'bg-white text-gray-900 shadow' : 'text-gray-700 hover:text-gray-900 hover:bg-white/70',
+                    ].join(' ')}
+                  >
                     {opt.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
