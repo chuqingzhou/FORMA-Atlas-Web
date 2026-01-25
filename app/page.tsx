@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Brain, Database, Microscope, TrendingUp, Sparkles } from 'lucide-react'
 import Navigation from '@/components/Navigation'
-import HeroVisual from '@/components/home/HeroVisual'
+import SunburstHeroVisual from '@/components/home/SunburstHeroVisual'
 import KeyStatsBar from '@/components/home/KeyStatsBar'
 import ImageComparisonSlider from '@/components/home/ImageComparisonSlider'
 import ThreeDomains from '@/components/home/ThreeDomains'
@@ -72,7 +72,7 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <HeroVisual />
+              <SunburstHeroVisual />
             </div>
           </div>
         </div>
