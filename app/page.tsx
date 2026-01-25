@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Brain, Database, Microscope, TrendingUp, Sparkles } from 'lucide-react'
+import Navigation from '@/components/Navigation'
+import HeroVisual from '@/components/home/HeroVisual'
+import KeyStatsBar from '@/components/home/KeyStatsBar'
+import ImageComparisonSlider from '@/components/home/ImageComparisonSlider'
+import ThreeDomains from '@/components/home/ThreeDomains'
 
 export default function Home() {
   return (
@@ -13,85 +18,87 @@ export default function Home() {
       <div className="fixed top-0 right-0 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
       <div className="fixed bottom-0 left-0 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
       
-      {/* Navigation */}
-      <nav className="glass-effect border-b border-gray-200/50 sticky top-0 z-50 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="relative">
-              <Image 
-                src="/logo.png" 
-                alt="FORMA Atlas Logo" 
-                width={56} 
-                height={56}
-                  className="object-contain transition-transform group-hover:scale-110"
-                style={{ backgroundColor: 'transparent' }}
-              />
-                <div className="absolute inset-0 bg-primary-400 rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">FORMA Atlas</span>
-            </Link>
-            <div className="flex space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group">
-                Home
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 transition-all group-hover:w-full"></span>
-              </Link>
-              <Link href="/browse" className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group">
-                Browse Data
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 transition-all group-hover:w-full"></span>
-              </Link>
-              <Link href="/about" className="text-gray-700 hover:text-primary-600 font-medium transition-colors relative group">
-                About
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 transition-all group-hover:w-full"></span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      {/* Navigation（含登录/登出） */}
+      <Navigation />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="text-center relative z-10">
-            <div className="flex justify-center mb-8 animate-fade-in-up">
-              <div className="relative">
-              <Image 
-                src="/logo.png" 
-                alt="FORMA Atlas Logo" 
-                  width={200} 
-                  height={200}
-                  className="object-contain animate-float"
-                style={{ backgroundColor: 'transparent' }}
-              />
-                <div className="absolute inset-0 bg-primary-400 rounded-full opacity-20 blur-3xl animate-pulse-glow"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/70 border border-white/40 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
+                <Sparkles className="h-4 w-4 text-primary-600" />
+                Nature Methods-style interactive atlas
+              </div>
+
+              <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up">
+                <span className="gradient-text">FORMA Atlas</span>
+                <span className="text-gray-900">: The First 4D MRI Atlas of Brain Organoid Development</span>
+              </h1>
+
+              <p className="mt-6 text-lg md:text-xl text-gray-700 max-w-xl leading-relaxed animate-fade-in-up">
+                A scalable, noninvasive resource spanning <span className="font-semibold text-gray-900">&gt;2,000</span> longitudinal volumes
+                across cerebral, MGE, and midbrain lineages.
+              </p>
+
+              <div className="mt-10 flex flex-wrap items-center gap-4 animate-fade-in-up">
+                <Link
+                  href="/browse"
+                  className="group relative bg-gradient-to-r from-primary-600 to-primary-700 text-white px-8 py-4 rounded-xl font-semibold text-base md:text-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <Sparkles className="h-5 w-5" />
+                    Explore the Atlas
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+                </Link>
+
+                <a
+                  href={process.env.NEXT_PUBLIC_DEEPFORMA_URL || 'https://github.com/chuqingzhou/FORMA-Atlas-Web'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="glass-effect text-primary-700 px-7 py-3.5 rounded-xl font-semibold border-2 border-primary-600/25 hover:border-primary-600 hover:bg-primary-50/40 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Download DeepFORMA
+                </a>
+
+                <Link
+                  href="/about"
+                  className="text-gray-700 hover:text-primary-700 font-semibold transition-colors"
+                >
+                  Read the paper-style overview →
+                </Link>
               </div>
             </div>
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <span className="gradient-text">FORMA Atlas</span>
-            </h1>
-            <p className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-              High-Throughput 4D MRI Platform
+
+            <div className="relative">
+              <HeroVisual />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Statistics Bar */}
+      <KeyStatsBar />
+
+      {/* Interactive Showcase */}
+      <section className="py-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <span className="gradient-text">Interactive Showcase</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              不止是静态图：用交互方式展示 MRI 与 AI 的价值，以及 DeepFORMA 的三大指标体系。
             </p>
-            <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-              Four-dimensional Organoid Resonance Mapping Atlas - The largest longitudinal MRI dataset of human brain organoids
-            </p>
-            <div className="flex justify-center items-center space-x-4 animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-              <Link
-                href="/browse"
-                className="group relative bg-gradient-to-r from-primary-600 to-primary-700 text-white px-12 py-5 rounded-xl font-semibold text-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Sparkles className="h-6 w-6" />
-                Explore Dataset
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-500 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity blur-xl"></div>
-              </Link>
-              <Link
-                href="/about"
-                className="glass-effect text-primary-600 px-10 py-4 rounded-xl font-semibold border-2 border-primary-600/30 hover:border-primary-600 hover:bg-primary-50/50 transition-all shadow-lg hover:shadow-xl"
-              >
-                Learn More
-              </Link>
+          </div>
+
+          <div className="grid gap-10">
+            <ImageComparisonSlider />
+
+            <div className="mt-2">
+              <div className="text-xl font-bold text-gray-900 mb-4">The “Three Domains” of Deep Phenotyping</div>
+              <ThreeDomains />
             </div>
           </div>
         </div>
@@ -105,7 +112,7 @@ export default function Home() {
               <span className="gradient-text">Platform Features</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A fully integrated platform for longitudinal monitoring of brain organoids
+              A fully integrated platform for large-scale longitudinal monitoring of brain organoids
             </p>
           </div>
 
@@ -129,9 +136,9 @@ export default function Home() {
                 <div className="bg-gradient-to-br from-purple-500 to-purple-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
                   <Database className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Comprehensive Dataset</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Large-scale Dataset</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Over 1,700 MRI volumes from three distinct brain regions
+                  &gt;2,000 longitudinal MRI volumes from three organoid lineages
                 </p>
               </div>
             </div>
@@ -180,7 +187,7 @@ export default function Home() {
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Spatial Resolution</h3>
-                  <p className="text-gray-600 text-lg">~40 μm isotropic</p>
+                  <p className="text-gray-600 text-lg">150 μm isotropic (atlas)</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Field Strength</h3>
@@ -201,8 +208,8 @@ export default function Home() {
                 <div className="glass-effect p-6 rounded-xl border border-primary-200/50 card-hover relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-primary-200 rounded-full opacity-20 blur-2xl"></div>
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Total Volumes</h3>
-                  <p className="text-5xl font-bold gradient-text mb-1">1,700+</p>
-                  <p className="text-gray-600">MRI volumes</p>
+                  <p className="text-5xl font-bold gradient-text mb-1">&gt;2,000</p>
+                  <p className="text-gray-600">longitudinal MRI volumes</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Brain Regions</h3>

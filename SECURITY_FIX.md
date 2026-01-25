@@ -149,3 +149,4 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 - [ ] 旧的public URL已失效
 - [ ] 代码已部署到生产环境
 
+
