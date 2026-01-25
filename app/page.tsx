@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { Brain, Database, Microscope, TrendingUp, Sparkles } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import SunburstHeroVisual from '@/components/home/SunburstHeroVisual'
-import KeyStatsBar from '@/components/home/KeyStatsBar'
 import ImageComparisonSlider from '@/components/home/ImageComparisonSlider'
 import ThreeDomains from '@/components/home/ThreeDomains'
 
@@ -78,40 +77,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Key Statistics Bar */}
-      <KeyStatsBar />
-
-      {/* Interactive Showcase */}
+      {/* Platform Features（原 Key Stats 位置） */}
       <section className="py-20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              <span className="gradient-text">Interactive Showcase</span>
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              不止是静态图：用交互方式展示 MRI 与 AI 的价值，以及 DeepFORMA 的三大指标体系。
-            </p>
-          </div>
-
-          <div className="grid gap-10">
-            <ImageComparisonSlider />
-
-            <div className="mt-2">
-              <div className="text-xl font-bold text-gray-900 mb-4">The “Three Domains” of Deep Phenotyping</div>
-              <ThreeDomains />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
               <span className="gradient-text">Platform Features</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               A fully integrated platform for large-scale longitudinal monitoring of brain organoids
             </p>
           </div>
@@ -167,6 +140,29 @@ export default function Home() {
                   True longitudinal tracking over months with region-specific trajectories
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Showcase */}
+      <section className="py-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <span className="gradient-text">Interactive Showcase</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              不止是静态图：用交互方式展示 MRI 与 AI 的价值，以及 DeepFORMA 的三大指标体系。
+            </p>
+          </div>
+
+          <div className="grid gap-10">
+            <ImageComparisonSlider />
+
+            <div className="mt-2">
+              <div className="text-xl font-bold text-gray-900 mb-4">The “Three Domains” of Deep Phenotyping</div>
+              <ThreeDomains />
             </div>
           </div>
         </div>
