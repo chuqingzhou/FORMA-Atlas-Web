@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { Activity, Box, ScanLine } from 'lucide-react'
-import MorphologyGLBPreview from '@/components/home/MorphologyGLBPreview'
 import TissueStateHistogram from '@/components/home/TissueStateHistogram'
+import H5Step4CHeatmap3D from '@/components/home/H5Step4CHeatmap3D'
+import H5Step4ECrossSection3D from '@/components/home/H5Step4ECrossSection3D'
 
 export default function ThreeDomains() {
   return (
@@ -19,7 +20,13 @@ export default function ThreeDomains() {
         </div>
 
         <div className="mt-5">
-          <MorphologyGLBPreview />
+          <H5Step4ECrossSection3D
+            fileUrl="/showcase/3-4_raw_pred_gt.h5"
+            mode="pred"
+            zSlice={5}
+            zThickness={1}
+            heightClass="h-56"
+          />
         </div>
 
         <div className="mt-5 grid grid-cols-3 gap-3 text-sm">
@@ -50,20 +57,13 @@ export default function ThreeDomains() {
           </div>
         </div>
 
-        <div className="mt-5 relative h-56 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-950 to-black">
-          <Image
-            src="/showcase/longitudinal_tracking_curves.png"
-            alt="Spatial pattern preview"
-            fill
-            className="object-cover opacity-90"
-            sizes="(max-width: 1024px) 100vw, 33vw"
-            priority={false}
+        <div className="mt-5">
+          <H5Step4CHeatmap3D
+            fileUrl="/showcase/3-4_raw_pred_gt.h5"
+            mode="pred"
+            sliceIndex={8}
+            heightClass="h-56"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="absolute bottom-3 left-3 rounded-lg bg-black/55 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
-            示例图（后续可替换为 RIS 热力图/剖面图）
-          </div>
-          <div className="pointer-events-none absolute inset-0 ring-1 ring-white/10" />
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2 text-sm">

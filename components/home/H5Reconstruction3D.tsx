@@ -168,8 +168,9 @@ function InstancedSpheres({
     () =>
       new THREE.MeshStandardMaterial({
         color,
-        metalness: 0.05,
-        roughness: 0.55,
+        metalness: 0.0,
+        roughness: 0.82,
+        envMapIntensity: 0.35,
         transparent: true,
         opacity: 0.92,
       }),
@@ -367,11 +368,11 @@ export default function H5Reconstruction3D({
           <color attach="background" args={['#05070b']} />
           <fog attach="fog" args={['#05070b', 2.6, 7.5]} />
 
-          <ambientLight intensity={0.35} />
-          <hemisphereLight intensity={0.4} groundColor="#0b1220" />
+          <ambientLight intensity={0.22} />
+          <hemisphereLight intensity={0.28} groundColor="#0b1220" />
           <directionalLight
             position={[4, 5, 3]}
-            intensity={1.5}
+            intensity={1.05}
             castShadow
             shadow-mapSize-width={1024}
             shadow-mapSize-height={1024}
@@ -390,7 +391,7 @@ export default function H5Reconstruction3D({
           {/* 地面阴影，增强体积感 */}
           <ContactShadows
             position={[0, -1.05, 0]}
-            opacity={0.35}
+            opacity={0.22}
             blur={2.5}
             far={2.5}
             scale={6}
