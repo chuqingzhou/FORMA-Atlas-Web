@@ -2,19 +2,70 @@
 
 import { Canvas } from '@react-three/fiber'
 import { ContactShadows, Environment, OrbitControls } from '@react-three/drei'
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { File } from 'jsfive'
 import * as THREE from 'three'
 
 type VolumeShape = { z: number; y: number; x: number }
+type Spacing = { y: number; x: number; z: number }
+
+const PAPER_FLESH_HEX = '#ffd4c4'
+// Figure2 Step3 使用的 spacing（mm）
+const DEFAULT_SPACING: Spacing = { y: 0.16, x: 0.16, z: 0.3 }
+// 你导出的 h5（以及论文脚本）里 raw/pred/gt 的轴顺序是 (y, x, z)
+const DEFAULT_AXIS_ORDER = 'y,x,z'
+
+function readAttr(ds: any, key: string) {
+  // jsfive 的 attrs/attributes 结构在不同版本可能不同，这里做兼容读取
+  try {
+    if (ds?.attrs) {
+      if (typeof ds.attrs.get === 'function') return ds.attrs.get(key)
+      if (key in ds.attrs) return ds.attrs[key]
+    }
+    if (ds?.attributes) {
+      if (typeof ds.attributes.get === 'function') return ds.attributes.get(key)
+      if (key in ds.attributes) return ds.attributes[key]
+    }
+  } catch {
+    // ignore
+  }
+  return undefined
+}
+
+function parseAxisOrder(v: unknown): string | null {
+  if (!v) return null
+  if (typeof v === 'string') return v
+  if (Array.isArray(v)) return v.join(',')
+  return null
+}
+
+function parseSpacing(v: unknown): Spacing | null {
+  // 支持 [y,x,z] 或 {y,x,z}
+  if (!v) return null
+  if (Array.isArray(v) && v.length >= 3) {
+    const y = Number(v[0])
+    const x = Number(v[1])
+    const z = Number(v[2])
+    if (Number.isFinite(y) && Number.isFinite(x) && Number.isFinite(z)) return { y, x, z }
+  }
+  if (typeof v === 'object') {
+    const anyV = v as any
+    const y = Number(anyV.y)
+    const x = Number(anyV.x)
+    const z = Number(anyV.z)
+    if (Number.isFinite(y) && Number.isFinite(x) && Number.isFinite(z)) return { y, x, z }
+  }
+  return null
+}
 
 function buildPointCloudFromMask(args: {
   mask: ArrayLike<number>
   shape: VolumeShape
+  spacing?: Spacing
   threshold?: number
   maxPoints?: number
 }) {
-  const { mask, shape, threshold = 0, maxPoints = 90000 } = args
+  const { mask, shape, spacing = DEFAULT_SPACING, threshold = 0, maxPoints = 90000 } = args
   const dimZ = shape.z
   const dimY = shape.y
   const dimX = shape.x
@@ -25,17 +76,24 @@ function buildPointCloudFromMask(args: {
 
   const positions: number[] = []
 
-  // 映射到固定大小的包围盒（约 [-0.9, 0.9]），避免点云跑出相机视野
-  const dimMax = Math.max(dimX, dimY, dimZ)
-  const halfX = 0.9 * (dimX / dimMax)
-  const halfY = 0.9 * (dimY / dimMax)
-  const halfZ = 0.9 * (dimZ / dimMax)
+  // 映射到固定大小的包围盒（约 [-0.9, 0.9]），但使用“物理尺寸”（spacing）做等比例缩放，
+  // 以对齐论文 Figure2 Step3 的 marching_cubes spacing=(0.16,0.16,0.3)
+  const lenX = Math.max(1e-8, (dimX - 1) * spacing.x)
+  const lenY = Math.max(1e-8, (dimY - 1) * spacing.y)
+  const lenZ = Math.max(1e-8, (dimZ - 1) * spacing.z)
+  const lenMax = Math.max(lenX, lenY, lenZ)
+  const halfX = 0.9 * (lenX / lenMax)
+  const halfY = 0.9 * (lenY / lenMax)
+  const halfZ = 0.9 * (lenZ / lenMax)
 
-  for (let z = 0; z < dimZ; z += step) {
-    for (let y = 0; y < dimY; y += step) {
-      const base = z * dimY * dimX + y * dimX
-      for (let x = 0; x < dimX; x += step) {
-        const v = mask[base + x] as number
+  // IMPORTANT:
+  // 这些 H5 的数组轴顺序是 (y, x, z) 且以 C-order 扁平化：idx=((y*X)+x)*Z+z。
+  // 原实现按 z-major 访问会导致形状被“错读”，出现明显变扁/变形。
+  for (let y = 0; y < dimY; y += step) {
+    for (let x = 0; x < dimX; x += step) {
+      const base = (y * dimX + x) * dimZ
+      for (let z = 0; z < dimZ; z += step) {
+        const v = mask[base + z] as number
         if (v > threshold) {
           const tx = dimX <= 1 ? 0 : x / (dimX - 1)
           const ty = dimY <= 1 ? 0 : y / (dimY - 1)
@@ -45,7 +103,7 @@ function buildPointCloudFromMask(args: {
           const ny = (ty - 0.5) * 2 * halfY
           const nz = (tz - 0.5) * 2 * halfZ
 
-          // 坐标系：X=原x，Y=原z，Z=原y（更接近“竖直为z”的观感）
+          // 坐标系：X=原x，Y=原z，Z=原y（更接近论文“竖直为z”的观感）
           positions.push(nx, nz, ny)
           if (positions.length / 3 >= maxPoints) {
             return new Float32Array(positions)
@@ -60,7 +118,7 @@ function buildPointCloudFromMask(args: {
 
 function PointsCloud({
   positions,
-  color = '#38bdf8',
+  color = PAPER_FLESH_HEX,
   size = 0.012,
 }: {
   positions: Float32Array
@@ -99,7 +157,7 @@ function PointsCloud({
 
 function InstancedSpheres({
   positions,
-  color = '#38bdf8',
+  color = PAPER_FLESH_HEX,
 }: {
   positions: Float32Array
   color?: string
@@ -110,10 +168,10 @@ function InstancedSpheres({
     () =>
       new THREE.MeshStandardMaterial({
         color,
-        metalness: 0.15,
-        roughness: 0.45,
+        metalness: 0.05,
+        roughness: 0.55,
         transparent: true,
-        opacity: 0.95,
+        opacity: 0.92,
       }),
     [color]
   )
@@ -148,17 +206,22 @@ function InstancedSpheres({
 
 function SlicePlane({
   shape,
+  spacing = DEFAULT_SPACING,
   sliceX,
 }: {
   shape: VolumeShape
+  spacing?: Spacing
   sliceX: number
 }) {
   const dimX = Math.max(1, shape.x)
   const t = dimX <= 1 ? 0 : sliceX / (dimX - 1)
-  const dimMax = Math.max(shape.x, shape.y, shape.z)
-  const halfX = 0.9 * (shape.x / dimMax)
-  const halfY = 0.9 * (shape.y / dimMax)
-  const halfZ = 0.9 * (shape.z / dimMax)
+  const lenX = Math.max(1e-8, (shape.x - 1) * spacing.x)
+  const lenY = Math.max(1e-8, (shape.y - 1) * spacing.y)
+  const lenZ = Math.max(1e-8, (shape.z - 1) * spacing.z)
+  const lenMax = Math.max(lenX, lenY, lenZ)
+  const halfX = 0.9 * (lenX / lenMax)
+  const halfY = 0.9 * (lenY / lenMax)
+  const halfZ = 0.9 * (lenZ / lenMax)
   const xPos = (t - 0.5) * 2 * halfX
 
   return (
@@ -185,6 +248,7 @@ export default function H5Reconstruction3D({
   const [error, setError] = useState<string | null>(null)
   const [shape, setShape] = useState<VolumeShape | null>(null)
   const [positions, setPositions] = useState<Float32Array | null>(null)
+  const [spacing, setSpacing] = useState<Spacing>(DEFAULT_SPACING)
   const pointsCount = positions ? Math.floor(positions.length / 3) : 0
 
   useEffect(() => {
@@ -213,7 +277,20 @@ export default function H5Reconstruction3D({
         const s = rawDs.shape || []
         if (s.length !== 3) throw new Error(`Expected 3D volume, got ${s.length}D`)
 
-        const [dimZ, dimY, dimX] = s as number[]
+        // 轴顺序：默认按 (y, x, z) 解释（与你导出的 h5 以及论文脚本一致）
+        const axisOrder = parseAxisOrder(readAttr(rawDs, 'axis_order')) || DEFAULT_AXIS_ORDER
+        const spacingAttr = parseSpacing(readAttr(rawDs, 'spacing')) || DEFAULT_SPACING
+
+        const [d0, d1, d2] = s as number[]
+        let dimY = d0
+        let dimX = d1
+        let dimZ = d2
+        if (axisOrder.toLowerCase().replace(/\\s/g, '') !== 'y,x,z') {
+          // 兜底：如果未来换了 axis_order，这里至少不崩；目前只保证 y,x,z 正确对齐
+          dimY = d0
+          dimX = d1
+          dimZ = d2
+        }
         const nextShape: VolumeShape = { z: dimZ, y: dimY, x: dimX }
 
         const mask = dsToUse.value as any
@@ -236,6 +313,7 @@ export default function H5Reconstruction3D({
         const pts = buildPointCloudFromMask({
           mask,
           shape: nextShape,
+          spacing: spacingAttr,
           threshold: thr,
           // InstancedMesh 过多会卡，限制点数用于“有光影”的体积感展示
           maxPoints: 25000,
@@ -243,6 +321,7 @@ export default function H5Reconstruction3D({
 
         if (cancelled) return
         setShape(nextShape)
+        setSpacing(spacingAttr)
         setPositions(pts)
         setLoading(false)
       } catch (e: any) {
@@ -306,7 +385,7 @@ export default function H5Reconstruction3D({
           <Environment preset="city" />
 
           {positions && <InstancedSpheres positions={positions} />}
-          {shape && <SlicePlane shape={shape} sliceX={sliceIndex} />}
+          {shape && <SlicePlane shape={shape} spacing={spacing} sliceX={sliceIndex} />}
 
           {/* 地面阴影，增强体积感 */}
           <ContactShadows
