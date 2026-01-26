@@ -29,6 +29,7 @@ interface H5Viewer2DProps {
   accessToken?: string // 用户访问token
   defaultShowPrediction?: boolean
   defaultShowLabel?: boolean
+  defaultSliceIndex?: number
   onSliceChange?: (sliceIndex: number) => void
 }
 
@@ -45,12 +46,13 @@ export default function H5Viewer2D({
   accessToken,
   defaultShowPrediction = false,
   defaultShowLabel = false,
+  defaultSliceIndex = 0,
   onSliceChange,
 }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageData, setImageData] = useState<ImageData | null>(null)
-  const [currentSlice, setCurrentSlice] = useState(0)
+  const [currentSlice, setCurrentSlice] = useState(defaultSliceIndex)
   const [zoom, setZoom] = useState(2) // 默认200%放大
   const [dimension] = useState<Dimension>('x') // 固定使用X维度（Y-Z平面）
   const [showPrediction, setShowPrediction] = useState(defaultShowPrediction)
@@ -63,6 +65,19 @@ export default function H5Viewer2D({
 
   // 固定使用X维度，计算切片数量
   const maxSlices = metadata?.shape?.x || dataShape?.x || 1
+
+  // 当切换文件或默认切片变化时，重置到指定切片，避免需要“手动切换刷新”
+  useEffect(() => {
+    if (typeof defaultSliceIndex === 'number') {
+      setCurrentSlice(defaultSliceIndex)
+    }
+    // 同时重置缩放与叠加开关到默认值（保持体验一致）
+    setZoom(2)
+    setShowPrediction(defaultShowPrediction)
+    setShowLabel(defaultShowLabel)
+    setDataShape(null)
+    setError(null)
+  }, [fileUrl, defaultSliceIndex, defaultShowPrediction, defaultShowLabel])
 
   // 检查权限
   useEffect(() => {
@@ -189,6 +204,18 @@ export default function H5Viewer2D({
         // 使用jsfive解析H5文件
         const h5File = new File(arrayBuffer)
         h5FileRef.current = h5File
+
+        // 预先读取 shape，避免初始显示 Slice 1/1
+        try {
+          const rawDataset = h5File.get('/raw')
+          const shape = rawDataset?.shape || []
+          if (Array.isArray(shape) && shape.length === 3) {
+            const [dimZ, dimY, dimX] = shape as any
+            setDataShape({ z: Number(dimZ), y: Number(dimY), x: Number(dimX) })
+          }
+        } catch {
+          // ignore
+        }
         
         setLoading(false)
       } catch (err: any) {
@@ -415,6 +442,12 @@ export default function H5Viewer2D({
   useEffect(() => {
     onSliceChange?.(currentSlice)
   }, [currentSlice, onSliceChange])
+
+  // shape 读到以后，夹一下切片索引，避免越界导致不刷新
+  useEffect(() => {
+    if (!maxSlices) return
+    setCurrentSlice((prev) => Math.max(0, Math.min(prev, maxSlices - 1)))
+  }, [maxSlices])
 
   return (
     <div className={`bg-gray-900 rounded-lg overflow-hidden ${className}`} ref={containerRef}>

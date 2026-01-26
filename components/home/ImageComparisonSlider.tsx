@@ -44,7 +44,9 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
                     onClick={() => setSelectedKey(opt.key)}
                     className={[
                       'px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors',
-                      active ? 'bg-white text-gray-900 shadow' : 'text-gray-700 hover:text-gray-900 hover:bg-white/70',
+                      active
+                        ? 'bg-primary-600 text-white shadow'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/70',
                     ].join(' ')}
                   >
                     {opt.label}
@@ -59,9 +61,11 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
       <div className="px-6 pb-6 pt-4">
         <div className="grid gap-6 lg:grid-cols-2">
           <H5Viewer2D
+            key={selected.key}
             fileUrl={selected.fileUrl}
             defaultShowPrediction
             defaultShowLabel
+            defaultSliceIndex={8}
             className="w-full"
             onSliceChange={setSliceIndex}
           />
