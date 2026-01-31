@@ -35,8 +35,6 @@ interface H5Viewer2DProps {
 
 type Dimension = 'x' | 'y' | 'z'
 
-const ALLOWED_EMAIL = 'chuqingz@126.com'
-
 export default function H5Viewer2D({
   fileUrl,
   filePath,
@@ -546,7 +544,7 @@ export default function H5Viewer2D({
               <p className="mb-4">{error}</p>
               {!hasPermission && (
                 <p className="text-sm mt-4 text-gray-300">
-                  请联系管理员 <a href={`mailto:${ALLOWED_EMAIL}`} className="text-blue-400 hover:underline">{ALLOWED_EMAIL}</a> 开启访问权限。
+                  请联系管理员开启访问权限。
                 </p>
               )}
               {hasPermission && (
