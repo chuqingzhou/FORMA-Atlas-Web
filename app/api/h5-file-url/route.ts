@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-// 创建服务端Supabase客户端（使用service role key）
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// 与 lib/supabase.ts 保持一致：未配置时使用 target 默认值
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://spb-bp106195q465mbtj.supabase.opentrust.net'
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsInJlZiI6InNwYi1icDEwNjE5NXE0NjVtYnRqIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3Njk4Mzc0OTAsImV4cCI6MjA4NTQxMzQ5MH0.BHSpuU9LowwJwYfqCvRKHPNUMyKXe_y5flP_SPV40lc'
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseServiceKey) {
   console.error('SUPABASE_SERVICE_ROLE_KEY is not set')
 }
 
 const supabaseAdmin = supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey, {
+  ? createClient(SUPABASE_URL, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
@@ -46,17 +50,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (!supabaseUrl || !anonKey) {
-      console.error('缺少 SUPABASE 环境变量: URL 或 ANON_KEY')
-      return NextResponse.json(
-        { error: '服务器配置错误', detail: '缺少 SUPABASE 环境变量' },
-        { status: 500 }
-      )
-    }
-
-    // 使用accessToken创建客户端来验证用户
-    const supabaseClient = createClient(supabaseUrl, anonKey, {
+    // 使用accessToken创建客户端来验证用户（URL/anon 已用默认值）
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
         headers: {
           Authorization: `Bearer ${accessToken}`
@@ -89,7 +84,10 @@ export async function POST(request: NextRequest) {
     // 生成signed URL（有效期1小时）
     if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: '服务器配置错误' },
+        {
+          error: '服务器配置错误',
+          detail: '请在 Vercel 环境变量中配置 SUPABASE_SERVICE_ROLE_KEY'
+        },
         { status: 500 }
       )
     }
