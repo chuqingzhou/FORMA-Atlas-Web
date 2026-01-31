@@ -46,7 +46,8 @@ export default function H5Viewer2D({
   accessToken,
   defaultShowPrediction = false,
   defaultShowLabel = false,
-  defaultSliceIndex = 0,
+  // 默认从第 9 张切片开始展示（UI 显示为 currentSlice + 1）
+  defaultSliceIndex = 8,
   onSliceChange,
 }: H5Viewer2DProps) {
   const [loading, setLoading] = useState(false)

@@ -17,10 +17,10 @@ if ! vercel whoami &> /dev/null; then
     vercel login
 fi
 
-# 设置环境变量
-echo "⚙️  配置环境变量..."
-vercel env add NEXT_PUBLIC_SUPABASE_URL production <<< "https://spb-xjxyazsru1q6t6c4.supabase.opentrust.net"
-vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production <<< "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsInJlZiI6InNwYi14anh5YXpzcnUxcTZ0NmM0IiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NjYxNTk4MDIsImV4cCI6MjA4MTczNTgwMn0.JLMyfKHZS_9uKzij37OlAAB36pBLuu_9IXkbfcXD6iE"
+# 设置环境变量（target: deepFORMA / spb-bp106195q465mbtj）
+echo "配置环境变量 (target: deepFORMA)..."
+vercel env add NEXT_PUBLIC_SUPABASE_URL production <<< "https://spb-bp106195q465mbtj.supabase.opentrust.net"
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production <<< "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsInJlZiI6InNwYi1icDEwNjE5NXE0NjVtYnRqIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3Njk4Mzc0OTAsImV4cCI6MjA4NTQxMzQ5MH0.BHSpuU9LowwJwYfqCvRKHPNUMyKXe_y5flP_SPV40lc"
 
 # 部署
 echo "📤 开始部署..."

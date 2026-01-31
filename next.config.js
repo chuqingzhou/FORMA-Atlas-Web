@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['spb-xjxyazsru1q6t6c4.supabase.opentrust.net'],
+    domains: ['spb-bp106195q465mbtj.supabase.opentrust.net', 'spb-xjxyazsru1q6t6c4.supabase.opentrust.net'],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {

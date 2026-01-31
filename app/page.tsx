@@ -152,9 +152,6 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               <span className="gradient-text">Interactive Showcase</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              不止是静态图：用交互方式展示 MRI 与 AI 的价值，以及 DeepFORMA 的三大指标体系。
-            </p>
           </div>
 
           <div className="grid gap-10">

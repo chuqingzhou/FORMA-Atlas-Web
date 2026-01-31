@@ -25,35 +25,32 @@ export default function ImageComparisonSlider({ className = '' }: { className?: 
 
   const [selectedKey, setSelectedKey] = useState<(typeof OPTIONS)[number]['key']>('cerebral')
   const selected = OPTIONS.find((o) => o.key === selectedKey) || OPTIONS[0]
-  const [sliceIndex, setSliceIndex] = useState(0)
+  // 默认从第 9 张切片开始展示（UI 显示为 currentSlice + 1）
+  const [sliceIndex, setSliceIndex] = useState(8)
 
   return (
     <div className={`glass-effect rounded-3xl border border-white/30 overflow-hidden ${className}`}>
       <div className="px-6 pt-6">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="text-lg font-bold text-gray-900">Before & After</div>
-          <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-600">raw / pred / gt（H5 交互切片）</div>
-            <div className="inline-flex rounded-xl border border-gray-200 bg-white/60 p-1 shadow-sm">
-              {OPTIONS.map((opt) => {
-                const active = opt.key === selectedKey
-                return (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={() => setSelectedKey(opt.key)}
-                    className={[
-                      'px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors',
-                      active
-                        ? 'bg-primary-600 text-white shadow'
-                        : 'text-gray-700 hover:text-gray-900 hover:bg-white/70',
-                    ].join(' ')}
-                  >
-                    {opt.label}
-                  </button>
-                )
-              })}
-            </div>
+        <div className="flex items-center justify-end gap-3 flex-wrap">
+          <div className="inline-flex rounded-xl border border-gray-200 bg-white/60 p-1 shadow-sm">
+            {OPTIONS.map((opt) => {
+              const active = opt.key === selectedKey
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => setSelectedKey(opt.key)}
+                  className={[
+                    'px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors',
+                    active
+                      ? 'bg-primary-600 text-white shadow'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-white/70',
+                  ].join(' ')}
+                >
+                  {opt.label}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
