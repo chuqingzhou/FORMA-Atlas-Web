@@ -130,8 +130,10 @@ export default function H5Viewer2D({
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          const errorMsg = errorData.error || '获取文件URL失败'
-          
+          const errorMsg = errorData.detail
+            ? `${errorData.error || '获取文件URL失败'}: ${errorData.detail}`
+            : (errorData.error || '获取文件URL失败')
+
           // 如果API返回服务器错误或配置错误，且存在fileUrl，使用fileUrl作为fallback
           // 这允许在bucket还是public时继续工作
           if ((response.status >= 500 || response.status === 401 || response.status === 403) && fileUrl) {

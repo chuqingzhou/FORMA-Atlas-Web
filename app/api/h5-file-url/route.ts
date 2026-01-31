@@ -19,10 +19,18 @@ const supabaseAdmin = supabaseServiceKey
   : null
 
 export async function POST(request: NextRequest) {
+  let body: { filePath?: string; accessToken?: string }
   try {
-    // 获取请求体
-    const body = await request.json()
-    const { filePath, accessToken } = body
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: '请求体格式错误，需要 JSON' },
+      { status: 400 }
+    )
+  }
+  const { filePath, accessToken } = body || {}
+
+  try {
 
     if (!filePath) {
       return NextResponse.json(
@@ -38,8 +46,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!supabaseUrl || !anonKey) {
+      console.error('缺少 SUPABASE 环境变量: URL 或 ANON_KEY')
+      return NextResponse.json(
+        { error: '服务器配置错误', detail: '缺少 SUPABASE 环境变量' },
+        { status: 500 }
+      )
+    }
+
     // 使用accessToken创建客户端来验证用户
-    const supabaseClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    const supabaseClient = createClient(supabaseUrl, anonKey, {
       global: {
         headers: {
           Authorization: `Bearer ${accessToken}`
@@ -57,13 +74,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 验证文件路径格式（防止路径遍历攻击）
-    if (!filePath.startsWith('organoid-files/') || filePath.includes('..')) {
+    // 防止路径遍历：禁止 .. 和绝对路径
+    if (filePath.includes('..') || filePath.startsWith('/')) {
       return NextResponse.json(
         { error: '无效的文件路径' },
         { status: 400 }
       )
     }
+    // 前端/数据库存的是桶内路径，如 S113W01/18-1-1.h5；若带 bucket 前缀则去掉
+    const pathInBucket = filePath.startsWith('organoid-files/')
+      ? filePath.slice('organoid-files/'.length)
+      : filePath
 
     // 生成signed URL（有效期1小时）
     if (!supabaseAdmin) {
@@ -75,12 +96,13 @@ export async function POST(request: NextRequest) {
 
     const { data: signedUrlData, error: urlError } = await supabaseAdmin.storage
       .from('organoid-files')
-      .createSignedUrl(filePath, 3600) // 1小时有效期
+      .createSignedUrl(pathInBucket, 3600) // 1小时有效期
 
     if (urlError || !signedUrlData) {
-      console.error('生成signed URL失败:', urlError)
+      const urlErrMsg = urlError?.message || String(urlError)
+      console.error('生成signed URL失败:', urlErrMsg)
       return NextResponse.json(
-        { error: '无法生成文件访问URL' },
+        { error: '无法生成文件访问URL', detail: urlErrMsg },
         { status: 500 }
       )
     }
@@ -90,9 +112,11 @@ export async function POST(request: NextRequest) {
       expiresAt: new Date(Date.now() + 3600 * 1000).toISOString()
     })
   } catch (error: any) {
-    console.error('API错误:', error)
+    const message = error?.message || String(error)
+    console.error('API错误:', message, error?.stack)
+    // 返回具体错误信息便于排查（生产环境可改为仅返回“服务器内部错误”）
     return NextResponse.json(
-      { error: '服务器内部错误' },
+      { error: '服务器内部错误', detail: message },
       { status: 500 }
     )
   }
