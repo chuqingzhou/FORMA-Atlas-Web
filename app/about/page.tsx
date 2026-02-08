@@ -104,7 +104,7 @@ export default function AboutPage() {
                     <Microscope className="h-5 w-5 text-primary-600" />
                     <h3 className="font-semibold text-gray-900">Spatial Resolution</h3>
                   </div>
-                  <p className="text-gray-700">~40 μm isotropic</p>
+                  <p className="text-gray-700">(dz, dy, dx) = (0.30, 0.16, 0.16) mm</p>
                 </div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-2 mb-2">

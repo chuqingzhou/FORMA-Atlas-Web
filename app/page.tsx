@@ -4,8 +4,6 @@ import { Brain, Database, Microscope, TrendingUp, Sparkles } from 'lucide-react'
 import Navigation from '@/components/Navigation'
 import SunburstHeroVisual from '@/components/home/SunburstHeroVisual'
 import ImageComparisonSlider from '@/components/home/ImageComparisonSlider'
-import ThreeDomains from '@/components/home/ThreeDomains'
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
@@ -25,11 +23,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/70 border border-white/40 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm">
-                <Sparkles className="h-4 w-4 text-primary-600" />
-                Nature Methods-style interactive atlas
-              </div>
-
               <h1 className="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight animate-fade-in-up">
                 <span className="gradient-text">FORMA Atlas</span>
                 <span className="text-gray-900">: The First 4D MRI Atlas of Brain Organoid Development</span>
@@ -53,7 +46,7 @@ export default function Home() {
                 </Link>
 
                 <a
-                  href={process.env.NEXT_PUBLIC_DEEPFORMA_URL || 'https://github.com/chuqingzhou/FORMA-Atlas-Web'}
+                  href={process.env.NEXT_PUBLIC_DEEPFORMA_URL || 'https://github.com/chuqingzhou/deepFORMA'}
                   target="_blank"
                   rel="noreferrer"
                   className="glass-effect text-primary-700 px-7 py-3.5 rounded-xl font-semibold border-2 border-primary-600/25 hover:border-primary-600 hover:bg-primary-50/40 transition-all shadow-lg hover:shadow-xl"
@@ -61,12 +54,6 @@ export default function Home() {
                   Download DeepFORMA
                 </a>
 
-                <Link
-                  href="/about"
-                  className="text-gray-700 hover:text-primary-700 font-semibold transition-colors"
-                >
-                  Read the paper-style overview →
-                </Link>
               </div>
             </div>
 
@@ -157,9 +144,10 @@ export default function Home() {
           <div className="grid gap-10">
             <ImageComparisonSlider />
 
-            <div className="mt-2">
-              <div className="text-xl font-bold text-gray-900 mb-4">The “Three Domains” of Deep Phenotyping</div>
-              <ThreeDomains />
+            <div className="mt-2 glass-effect rounded-xl border border-gray-200/50 p-6">
+              <p className="text-gray-700 leading-relaxed">
+                用 T2 信号分布刻画组织状态（例如"致密/水肿"等）。当前为展示占位，后续可直接接入你们的 histogram/伪彩图输出。
+              </p>
             </div>
           </div>
         </div>
@@ -180,7 +168,7 @@ export default function Home() {
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Spatial Resolution</h3>
-                  <p className="text-gray-600 text-lg">150 μm isotropic (atlas)</p>
+                  <p className="text-gray-600 text-lg">(dz, dy, dx) = (0.30, 0.16, 0.16) mm</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Field Strength</h3>
