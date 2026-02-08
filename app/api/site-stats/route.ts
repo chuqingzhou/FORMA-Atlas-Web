@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const dynamic = 'force-dynamic'
+
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://spb-bp106195q465mbtj.supabase.opentrust.net'
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -23,7 +25,10 @@ export async function GET() {
       .eq('id', 'default')
       .single()
 
-    return NextResponse.json({ total_visits: Number(data?.total_visits ?? 0) })
+    return NextResponse.json(
+      { total_visits: Number(data?.total_visits ?? 0) },
+      { headers: { 'Cache-Control': 'no-store' } }
+    )
   } catch {
     return NextResponse.json({ total_visits: 0 })
   }

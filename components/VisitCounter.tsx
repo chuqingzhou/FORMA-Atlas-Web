@@ -6,18 +6,21 @@ export default function VisitCounter() {
   const [totalVisits, setTotalVisits] = useState<number | null>(null)
 
   useEffect(() => {
-    const recordAndFetch = async () => {
+    const recordVisit = async () => {
       try {
-        await fetch('/api/record-visit', { method: 'POST' })
-        const res = await fetch('/api/site-stats')
+        const res = await fetch('/api/record-visit', {
+          method: 'POST',
+          cache: 'no-store'
+        })
         const data = await res.json()
-        setTotalVisits(data.total_visits ?? 0)
+        const count = Number(data?.total_visits ?? 0)
+        setTotalVisits(count)
       } catch {
         setTotalVisits(0)
       }
     }
 
-    recordAndFetch()
+    recordVisit()
   }, [])
 
   if (totalVisits === null) return null
