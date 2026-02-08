@@ -57,7 +57,7 @@ export default function HeroVisual({
       {/* hint for missing hero assets (only when video missing) */}
       {videoError && (
         <div className="absolute bottom-4 left-4 right-4 rounded-xl bg-black/55 px-4 py-3 text-sm text-gray-200 backdrop-blur">
-          未检测到 Hero 视频（建议放在 `public/hero/hero.mp4`）。当前使用高对比度扫描风格背景作为占位。
+          Hero video not detected (suggest placing at `public/hero/hero.mp4`). Using high-contrast scan-style background as placeholder.
         </div>
       )}
 

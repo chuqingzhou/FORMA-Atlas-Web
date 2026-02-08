@@ -35,7 +35,7 @@ export default function SunburstHeroVisual({
             rel="noreferrer"
             className="pointer-events-auto rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15 transition-colors backdrop-blur border border-white/10"
           >
-            新窗口打开
+            Open in new window
           </a>
         </div>
       </div>

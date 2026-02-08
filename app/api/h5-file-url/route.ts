@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     body = await request.json()
   } catch {
     return NextResponse.json(
-      { error: '请求体格式错误，需要 JSON' },
+      { error: 'Invalid request body. JSON required.' },
       { status: 400 }
     )
   }
@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
 
     if (!filePath) {
       return NextResponse.json(
-        { error: '缺少文件路径' },
+        { error: 'Missing file path.' },
         { status: 400 }
       )
     }
 
     if (!accessToken) {
       return NextResponse.json(
-        { error: '未授权：需要登录' },
+        { error: 'Unauthorized: Sign in required.' },
         { status: 401 }
       )
     }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json(
-        { error: '未授权：无效的token' },
+        { error: 'Unauthorized: Invalid token.' },
         { status: 401 }
       )
     }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     // 防止路径遍历：禁止 .. 和绝对路径
     if (filePath.includes('..') || filePath.startsWith('/')) {
       return NextResponse.json(
-        { error: '无效的文件路径' },
+        { error: 'Invalid file path.' },
         { status: 400 }
       )
     }
@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
     if (!supabaseAdmin) {
       return NextResponse.json(
         {
-          error: '服务器配置错误',
-          detail: '请在 Vercel 环境变量中配置 SUPABASE_SERVICE_ROLE_KEY'
+error: 'Server configuration error',
+            detail: 'Please configure SUPABASE_SERVICE_ROLE_KEY in Vercel environment variables'
         },
         { status: 500 }
       )
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       const urlErrMsg = urlError?.message || String(urlError)
       console.error('生成signed URL失败:', urlErrMsg)
       return NextResponse.json(
-        { error: '无法生成文件访问URL', detail: urlErrMsg },
+        { error: 'Unable to generate file access URL', detail: urlErrMsg },
         { status: 500 }
       )
     }
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     console.error('API错误:', message, error?.stack)
     // 返回具体错误信息便于排查（生产环境可改为仅返回“服务器内部错误”）
     return NextResponse.json(
-      { error: '服务器内部错误', detail: message },
+      { error: 'Internal server error', detail: message },
       { status: 500 }
     )
   }

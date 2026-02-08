@@ -81,7 +81,7 @@ export default function H5Viewer2D({
   // 检查权限
   useEffect(() => {
     if (!hasPermission) {
-      setError('权限不足：请联系管理员开启访问权限')
+      setError('Permission denied. Please contact the administrator to enable access.')
       setLoading(false)
       return
     }
@@ -108,7 +108,7 @@ export default function H5Viewer2D({
     }
 
     if (!accessToken) {
-      setError('缺少访问令牌，无法获取文件')
+      setError('Missing access token. Unable to fetch file.')
       return
     }
 
@@ -131,8 +131,8 @@ export default function H5Viewer2D({
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
           const errorMsg = errorData.detail
-            ? `${errorData.error || '获取文件URL失败'}: ${errorData.detail}`
-            : (errorData.error || '获取文件URL失败')
+            ? `${errorData.error || 'Failed to get file URL'}: ${errorData.detail}`
+            : (errorData.error || 'Failed to get file URL')
 
           // 如果API返回服务器错误或配置错误，且存在fileUrl，使用fileUrl作为fallback
           // 这允许在bucket还是public时继续工作
@@ -166,7 +166,7 @@ export default function H5Viewer2D({
           setSecureFileUrl(fileUrl)
           setLoading(false)
         } else {
-          setError(err.message || '获取文件访问权限失败')
+          setError(err.message || 'Failed to get file access permission')
           setLoading(false)
         }
       }
@@ -182,9 +182,9 @@ export default function H5Viewer2D({
 
     if (!urlToUse || !hasPermission) {
       if (!hasPermission) {
-        setError('权限不足：请联系管理员开启访问权限')
+        setError('Permission denied. Please contact the administrator to enable access.')
       } else if (!filePath && !fileUrl) {
-        setError('缺少文件路径或URL')
+        setError('Missing file path or URL')
       }
       return
     }
@@ -221,7 +221,7 @@ export default function H5Viewer2D({
         setLoading(false)
       } catch (err: any) {
         console.error('Error loading H5 file:', err)
-        setError(err.message || '加载H5文件失败')
+        setError(err.message || 'Failed to load H5 file')
         setLoading(false)
       }
     }
@@ -250,13 +250,13 @@ export default function H5Viewer2D({
         // 读取raw数据集
         const rawDataset = h5File.get('/raw')
         if (!rawDataset) {
-          throw new Error('找不到 raw 数据集')
+          throw new Error('raw dataset not found')
         }
 
         // 获取数据形状
         const shape = rawDataset.shape || []
         if (shape.length !== 3) {
-          throw new Error(`预期的3D数据，但得到 ${shape.length}D 数据`)
+          throw new Error(`Expected 3D data, but got ${shape.length}D data`)
         }
 
         const [dimZ, dimY, dimX] = shape
@@ -305,7 +305,7 @@ export default function H5Viewer2D({
           // 如果数据是按维度组织的数组
           sliceRaw = rawData[sliceIdx]
         } else {
-          throw new Error('无法读取raw数据，数据格式不正确')
+          throw new Error('Unable to read raw data. Invalid data format.')
         }
 
         // 读取 prediction 数据集（兼容 /prediction 与 /pred）
@@ -414,7 +414,7 @@ export default function H5Viewer2D({
         setLoading(false)
       } catch (err: any) {
         console.error('Error loading slice:', err)
-        setError(err.message || '加载切片数据失败')
+        setError(err.message || 'Failed to load slice data')
         setLoading(false)
       }
     }
@@ -542,16 +542,16 @@ export default function H5Viewer2D({
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
             <div className="text-red-400 text-center px-4">
-              <p className="text-lg font-semibold mb-2">权限不足</p>
+              <p className="text-lg font-semibold mb-2">Permission denied</p>
               <p className="mb-4">{error}</p>
               {!hasPermission && (
                 <p className="text-sm mt-4 text-gray-300">
-                  请联系管理员开启访问权限。
+                  Please contact the administrator to enable access.
                 </p>
               )}
               {hasPermission && (
                 <p className="text-sm mt-4 text-gray-400">
-                  请检查H5文件URL是否正确，以及文件格式是否支持。
+                  Please check if the H5 file URL is correct and the file format is supported.
                 </p>
               )}
             </div>

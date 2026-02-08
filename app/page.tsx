@@ -30,7 +30,7 @@ export default function Home() {
 
               <p className="mt-6 text-lg md:text-xl text-gray-700 max-w-xl leading-relaxed animate-fade-in-up">
                 A scalable, noninvasive resource spanning <span className="font-semibold text-gray-900">&gt;2,000</span> longitudinal volumes
-                across cerebral, MGE, and midbrain lineages.
+                across cerebral, Medial Ganglionic Eminence (MGE), and midbrain lineages.
               </p>
 
               <div className="mt-10 flex flex-wrap items-center gap-4 animate-fade-in-up">
@@ -144,11 +144,6 @@ export default function Home() {
           <div className="grid gap-10">
             <ImageComparisonSlider />
 
-            <div className="mt-2 glass-effect rounded-xl border border-gray-200/50 p-6">
-              <p className="text-gray-700 leading-relaxed">
-                用 T2 信号分布刻画组织状态（例如"致密/水肿"等）。当前为展示占位，后续可直接接入你们的 histogram/伪彩图输出。
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -194,11 +189,11 @@ export default function Home() {
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Brain Regions</h3>
-                  <p className="text-gray-600 text-lg">Cerebral, MGE, Midbrain</p>
+                  <p className="text-gray-600 text-lg">Cerebral, Medial Ganglionic Eminence, Midbrain</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Genotypes</h3>
-                  <p className="text-gray-600 text-lg">2 Healthy Control + 2 SCZ Patient-derived lines</p>
+                  <p className="text-gray-600 text-lg">10 Healthy Control + 2 SCZ Patient-derived lines</p>
                 </div>
                 <div className="glass-effect p-6 rounded-xl border border-gray-200/50 card-hover">
                   <h3 className="font-bold text-gray-900 mb-2 text-lg">Longitudinal Coverage</h3>

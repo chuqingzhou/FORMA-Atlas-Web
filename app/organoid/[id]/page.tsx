@@ -59,7 +59,7 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">正在验证身份...</p>
+            <p className="text-gray-600">Verifying...</p>
           </div>
         </div>
       </div>
@@ -73,13 +73,13 @@ export default function OrganoidPage({ params }: { params: { id: string } }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
           <div className="text-center">
             <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">需要登录</h1>
-            <p className="text-xl text-gray-600 mb-6">请先登录以访问类器官详情</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Sign in required</h1>
+            <p className="text-xl text-gray-600 mb-6">Please sign in to access organoid details</p>
             <Link
               href="/auth/login"
               className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
             >
-              前往登录
+              Sign in
             </Link>
           </div>
         </div>

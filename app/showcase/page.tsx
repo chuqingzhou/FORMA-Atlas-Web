@@ -32,7 +32,7 @@ export default function ShowcasePage() {
             Interactive Showcase
           </h1>
           <p className="mt-2 text-gray-600">
-            Plotly 统计图与 3D（GLB）可视化预览。
+            Plotly statistics chart and 3D (GLB) visualization preview.
           </p>
         </div>
 
@@ -45,14 +45,14 @@ export default function ShowcasePage() {
                 target="_blank"
                 className="text-sm font-semibold text-primary-700 hover:text-primary-800"
               >
-                新窗口打开 →
+                Open in new window
               </Link>
             </div>
             <SunburstHeroVisual className="bg-black" />
           </div>
 
           <div className="mt-4">
-            <div className="text-xl font-bold text-gray-900 mb-3">3D 可视化（GLB）</div>
+            <div className="text-xl font-bold text-gray-900 mb-3">3D Visualization (GLB)</div>
             <div className="grid gap-6 md:grid-cols-3">
               {GLB_ITEMS.map((item) => (
                 <div key={item.url} className="glass-effect rounded-2xl border border-gray-200/50 p-4">
@@ -65,14 +65,14 @@ export default function ShowcasePage() {
                       rel="noreferrer"
                       className="font-semibold text-primary-700 hover:text-primary-800"
                     >
-                      直接打开 →
+                      Open directly
                     </a>
                     <a
                       href={item.url}
                       download
                       className="text-gray-600 hover:text-gray-900"
                     >
-                      下载
+                      Download
                     </a>
                   </div>
                 </div>

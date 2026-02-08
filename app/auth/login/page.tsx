@@ -29,14 +29,14 @@ export default function LoginPage() {
         router.refresh()
       } else {
         await signUp(email, password)
-        setMessage('注册成功！请检查您的邮箱以验证账户（如果需要）。')
+        setMessage('Registration successful! Please check your email to verify your account (if required).')
         setTimeout(() => {
           setIsLogin(true)
           setMessage('')
         }, 3000)
       }
     } catch (err: any) {
-      setError(err.message || '操作失败，请重试')
+      setError(err.message || 'Operation failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -53,12 +53,12 @@ export default function LoginPage() {
               <Brain className="h-16 w-16 text-primary-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {isLogin ? '登录' : '注册'}
+              {isLogin ? 'Sign in' : 'Sign up'}
             </h1>
             <p className="text-gray-600">
               {isLogin 
-                ? '登录以访问 FORMA Atlas 数据集' 
-                : '创建账户以访问 FORMA Atlas 数据集'}
+                ? 'Sign in to access the FORMA Atlas dataset' 
+                : 'Create an account to access the FORMA Atlas dataset'}
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                邮箱
+                Email
               </label>
               <input
                 id="email"
@@ -92,7 +92,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                密码
+                Password
               </label>
               <input
                 id="password"
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
               />
               {!isLogin && (
-                <p className="mt-1 text-xs text-gray-500">密码至少需要6个字符</p>
+                <p className="mt-1 text-xs text-gray-500">Password must be at least 6 characters</p>
               )}
             </div>
 
@@ -114,7 +114,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 rounded-lg font-semibold hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
+              {loading ? 'Processing...' : (isLogin ? 'Sign in' : 'Sign up')}
             </button>
           </form>
 
@@ -128,13 +128,13 @@ export default function LoginPage() {
               }}
               className="text-primary-600 hover:text-primary-700 font-medium text-sm"
             >
-              {isLogin ? '还没有账户？点击注册' : '已有账户？点击登录'}
+              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
             </button>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
-              访问数据集需要登录。注册账户是免费的。
+              Sign in is required to access the dataset. Account registration is free.
             </p>
           </div>
         </div>

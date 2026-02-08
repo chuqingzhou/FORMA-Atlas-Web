@@ -121,7 +121,7 @@ export default function Navigation() {
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>登出</span>
+                      <span>Sign out</span>
                     </button>
                   </div>
                 ) : (
@@ -130,7 +130,7 @@ export default function Navigation() {
                     className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
                   >
                     <LogIn className="h-4 w-4" />
-                    <span>登录</span>
+                    <span>Sign in</span>
                   </Link>
                 )}
               </>
