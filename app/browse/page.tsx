@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Brain, Filter, Search, FileText, Calendar } from 'lucide-react'
-import { getOrganoids, type OrganoidDetail } from '@/lib/organoid'
+import { Brain, Search, BarChart3 } from 'lucide-react'
+import { getOrganoids, type AtlasOrganoid } from '@/lib/organoid'
 import Navigation from '@/components/Navigation'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -14,8 +14,8 @@ interface BrowsePageProps {
 
 export default function BrowsePage({ searchParams }: BrowsePageProps) {
   const router = useRouter()
-  const { user, loading: authLoading, isAuthenticated } = useAuth()
-  const [organoids, setOrganoids] = useState<OrganoidDetail[]>([])
+  const { loading: authLoading, isAuthenticated } = useAuth()
+  const [organoids, setOrganoids] = useState<AtlasOrganoid[]>([])
   const [loading, setLoading] = useState(true)
 
   // 检查认证状态
@@ -80,7 +80,7 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by Subject ID, Scan ID, Well ID..."
+                placeholder="Search by Organoid ID, Scan ID, Line ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -92,9 +92,9 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="">All Regions</option>
-              <option value="CEREBRAL">Cerebral</option>
-              <option value="MGE">MGE</option>
-              <option value="MIDBRAIN">Midbrain</option>
+              <option value="CO">Cerebral (CO)</option>
+              <option value="MGEO">MGE (MGEO)</option>
+              <option value="MidO">Midbrain (MidO)</option>
             </select>
             <select
               value={filters.diagnose || ''}
@@ -104,6 +104,7 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
               <option value="">All Diagnoses</option>
               <option value="HC">Healthy Control</option>
               <option value="SCZ">Schizophrenia</option>
+              <option value="BP">Bipolar</option>
             </select>
           </div>
           <div className="mt-4 flex items-center space-x-4">
@@ -157,18 +158,18 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
             {organoids.map((organoid) => (
               <Link
                 key={organoid.id}
-                href={`/organoid/${organoid.subject_id}`}
+                href={`/organoid/${organoid.organoid_id}`}
                 className="glass-effect rounded-xl shadow-lg p-6 card-hover border border-gray-200/50"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {organoid.subject_id}
+                      {organoid.organoid_id}
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {organoid.region_abbreviation && (
+                      {organoid.region && (
                         <span className="inline-block px-2 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded">
-                          {organoid.region_abbreviation}
+                          {organoid.region}
                         </span>
                       )}
                       {organoid.tracking_type && (
@@ -187,10 +188,10 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
                       <span className="text-gray-900 font-medium">{organoid.scan_id}</span>
                     </div>
                   )}
-                  {organoid.line_name && (
+                  {organoid.line_id && (
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Cell Line:</span>
-                      <span className="text-gray-900 font-medium">{organoid.line_name}</span>
+                      <span className="text-gray-500">Line:</span>
+                      <span className="text-gray-900 font-medium">{organoid.line_id}</span>
                     </div>
                   )}
                   {organoid.diagnose && (
@@ -205,21 +206,29 @@ export default function BrowsePage({ searchParams }: BrowsePageProps) {
                       <span className="text-gray-900 font-medium">{organoid.age}</span>
                     </div>
                   )}
-                  {organoid.scan_date && (
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-xs">{new Date(organoid.scan_date).toLocaleDateString()}</span>
+                  {organoid.volume != null && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Volume:</span>
+                      <span className="text-gray-900 font-medium">{organoid.volume.toFixed(2)} mm3</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <FileText className="h-4 w-4" />
-                    <span className="text-xs">{organoid.file_count || 0} file(s)</span>
-                  </div>
+                  {organoid.voxel_count != null && (
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <BarChart3 className="h-4 w-4" />
+                      <span className="text-xs">{organoid.voxel_count.toLocaleString()} voxels</span>
+                    </div>
+                  )}
+                  {organoid.sphericity != null && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Sphericity:</span>
+                      <span className="text-gray-900 font-medium">{organoid.sphericity.toFixed(3)}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <span className="text-primary-600 text-sm font-medium hover:text-primary-700 flex items-center gap-1">
-                    View Details →
+                    View Details
                   </span>
                 </div>
               </Link>

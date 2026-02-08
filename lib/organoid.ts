@@ -2,57 +2,34 @@
 
 import { supabase } from './supabase'
 
-// 数据库类型定义
-export interface Batch {
+// atlas_organoids 表类型（新数据源）
+export interface AtlasOrganoid {
   id: string
-  batch_id: string
-  batch_tag: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface CellLine {
-  id: string
-  line_id: string
-  line_name: string | null
-  diagnose: string | null
-  description: string | null
-  created_at: string
-  updated_at: string
-}
-
-export interface Region {
-  id: string
-  name: string
-  abbreviation: string
-  description: string | null
-  created_at: string
-}
-
-export interface TrackingGroup {
-  id: string
-  tracked_id: string
-  description: string | null
-  created_at: string
-}
-
-export interface Organoid {
-  id: string
-  subject_id: string
-  raw_data_id: string | null
+  organoid_id: string
   scan_id: string
-  well_id: string | null
+  connect_id: number | null
   batch_id: string | null
   line_id: string | null
-  region_id: string | null
   tracking_type: boolean
   tracked_id: string | null
   age: string | null
-  scan_date: string | null
-  notes: string | null
+  diagnose: string | null
+  region: string | null
+  voxel_count: number | null
+  volume: number | null
+  sav_ratio: number | null
+  sphericity: number | null
+  intensity_mean: number | null
+  inner_20_mean: number | null
+  outer_20_mean: number | null
+  intensity_cv: number | null
+  radial_intensity_slope: number | null
+  inner_outer_20_ratio: number | null
   created_at: string
-  updated_at: string
 }
+
+// 兼容旧接口的别名
+export type OrganoidDetail = AtlasOrganoid
 
 export interface OrganoidFile {
   id: string
@@ -68,19 +45,7 @@ export interface OrganoidFile {
   created_at: string
 }
 
-export interface OrganoidDetail extends Organoid {
-  batch_id_value: string | null
-  batch_tag: string | null
-  line_id_value: string | null
-  line_name: string | null
-  diagnose: string | null
-  region_name: string | null
-  region_abbreviation: string | null
-  tracked_id_value: string | null
-  file_count: number
-}
-
-// 文件上传函数
+// 文件上传函数（保留供其他用途）
 export async function uploadOrganoidFile(
   organoidId: string,
   file: File,
@@ -184,17 +149,17 @@ export async function deleteOrganoidFile(fileId: string): Promise<void> {
   }
 }
 
-// 获取类器官详情（包含关联信息）
-export async function getOrganoidDetail(subjectId: string): Promise<OrganoidDetail | null> {
+// 获取类器官详情（atlas_organoids 表，按 organoid_id 查询）
+export async function getOrganoidDetail(organoidId: string): Promise<AtlasOrganoid | null> {
   const { data, error } = await supabase
-    .from('organoid_details')
+    .from('atlas_organoids')
     .select('*')
-    .eq('subject_id', subjectId)
+    .eq('organoid_id', organoidId)
     .single()
 
   if (error) {
     if (error.code === 'PGRST116') {
-      return null // 未找到记录
+      return null
     }
     throw new Error(`获取类器官详情失败: ${error.message}`)
   }
@@ -202,7 +167,7 @@ export async function getOrganoidDetail(subjectId: string): Promise<OrganoidDeta
   return data
 }
 
-// 获取所有类器官（带分页）
+// 获取所有类器官（atlas_organoids 表）
 export async function getOrganoids(
   page: number = 1,
   pageSize: number = 20,
@@ -212,14 +177,13 @@ export async function getOrganoids(
     tracking_type?: boolean
     search?: string
   }
-): Promise<{ data: OrganoidDetail[]; count: number }> {
+): Promise<{ data: AtlasOrganoid[]; count: number }> {
   let query = supabase
-    .from('organoid_details')
+    .from('atlas_organoids')
     .select('*', { count: 'exact' })
 
-  // 应用过滤器
   if (filters?.region) {
-    query = query.eq('region_abbreviation', filters.region)
+    query = query.eq('region', filters.region)
   }
   if (filters?.diagnose) {
     query = query.eq('diagnose', filters.diagnose)
@@ -229,14 +193,13 @@ export async function getOrganoids(
   }
   if (filters?.search) {
     query = query.or(
-      `subject_id.ilike.%${filters.search}%,scan_id.ilike.%${filters.search}%,raw_data_id.ilike.%${filters.search}%,well_id.ilike.%${filters.search}%`
+      `organoid_id.ilike.%${filters.search}%,scan_id.ilike.%${filters.search}%,line_id.ilike.%${filters.search}%,batch_id.ilike.%${filters.search}%`
     )
   }
 
-  // 分页
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
-  query = query.range(from, to).order('subject_id', { ascending: true })
+  query = query.range(from, to).order('organoid_id', { ascending: true })
 
   const { data, error, count } = await query
 
@@ -251,46 +214,17 @@ export async function getOrganoids(
 }
 
 // 获取追踪组的所有类器官
-export async function getTrackingGroupOrganoids(trackedId: string): Promise<OrganoidDetail[]> {
+export async function getTrackingGroupOrganoids(trackedId: string): Promise<AtlasOrganoid[]> {
   const { data, error } = await supabase
-    .from('organoid_details')
+    .from('atlas_organoids')
     .select('*')
-    .eq('tracked_id_value', trackedId)
-    .order('scan_date', { ascending: true })
+    .eq('tracked_id', trackedId)
+    .order('age', { ascending: true })
 
   if (error) {
     throw new Error(`获取追踪组类器官失败: ${error.message}`)
   }
 
   return data || []
-}
-
-// 创建或获取追踪组
-export async function getOrCreateTrackingGroup(trackedId: string): Promise<TrackingGroup> {
-  // 先尝试获取
-  const { data: existing } = await supabase
-    .from('tracking_groups')
-    .select('*')
-    .eq('tracked_id', trackedId)
-    .single()
-
-  if (existing) {
-    return existing
-  }
-
-  // 如果不存在，创建新的
-  const { data: newGroup, error } = await supabase
-    .from('tracking_groups')
-    .insert({
-      tracked_id: trackedId
-    })
-    .select()
-    .single()
-
-  if (error) {
-    throw new Error(`创建追踪组失败: ${error.message}`)
-  }
-
-  return newGroup
 }
 
