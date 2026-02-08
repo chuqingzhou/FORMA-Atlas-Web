@@ -32,10 +32,9 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     )
   }
-  const { filePath, accessToken } = body || {}
+  const { filePath } = body || {}
 
   try {
-
     if (!filePath) {
       return NextResponse.json(
         { error: 'Missing file path.' },
@@ -43,33 +42,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Sign in required.' },
-        { status: 401 }
-      )
-    }
-
-    // 使用accessToken创建客户端来验证用户（URL/anon 已用默认值）
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      }
-    })
-
-    // 验证用户token并获取用户信息
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Invalid token.' },
-        { status: 401 }
-      )
-    }
-
-    // 防止路径遍历：禁止 .. 和绝对路径
+    // Path traversal check
     if (filePath.includes('..') || filePath.startsWith('/')) {
       return NextResponse.json(
         { error: 'Invalid file path.' },

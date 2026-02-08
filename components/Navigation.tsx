@@ -2,25 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
-import { signOut } from '@/lib/auth'
-import { LogIn, LogOut, User } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 export default function Navigation() {
   const pathname = usePathname()
-  const router = useRouter()
-  const { user, loading } = useAuth()
-
-  const handleSignOut = async () => {
-    try {
-      await signOut()
-      router.push('/')
-      router.refresh()
-    } catch (error) {
-      console.error('Sign out error:', error)
-    }
-  }
 
   return (
     <nav className="glass-effect border-b border-gray-200/50 sticky top-0 z-50">
@@ -106,35 +91,6 @@ export default function Navigation() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 transition-all group-hover:w-full"></span>
               )}
             </Link>
-            
-            {/* 认证按钮 */}
-            {!loading && (
-              <>
-                {user ? (
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <User className="h-4 w-4" />
-                      <span className="hidden sm:inline">{user.email}</span>
-                    </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign out</span>
-                    </button>
-                  </div>
-                ) : (
-                  <Link
-                    href="/auth/login"
-                    className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-                  >
-                    <LogIn className="h-4 w-4" />
-                    <span>Sign in</span>
-                  </Link>
-                )}
-              </>
-            )}
           </div>
         </div>
       </div>
